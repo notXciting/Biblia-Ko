@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v1.2.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v2.0.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -20,7 +20,7 @@
   <img src="docs/screenshots/compare.png" width="200" alt="Compare versions">
 </p>
 
-Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles ten translations (two Tagalog, eight English), searches across the whole Bible quickly, and opens any verse instantly.
+Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles ten translations (two Tagalog, eight English), searches across the whole Bible quickly, opens any verse instantly, and can **read the Bible aloud** in Tagalog or English using your phone's built-in offline voices.
 
 ## Features
 
@@ -29,6 +29,14 @@ Biblia Ko works **completely offline**. It needs no account and no internet, and
 - **Swipe between chapters**, or use the page arrows. Your place is remembered between sessions.
 - **Two verse layouts:** a flowing *Paragraph* or *Verse by verse*, each verse on its own line.
 - Serif reading font, adjustable **font size** and **line spacing**, with live previews in Settings.
+
+### Listen (read aloud, offline)
+- Tap the **headphones** button to have the Bible read aloud, verse by verse, using your phone's own text-to-speech. It works **without internet**: only installed, offline voices are ever used.
+- The **voice follows the Bible version**: Tagalog versions are read in Filipino (fil-PH), English versions in English (en-US). Switching versions while listening continues from the same verse in the new voice.
+- The verse being read is **highlighted and scrolled into view**. Reading continues into the next chapter and book until you stop it. Empty verses are skipped.
+- A floating player has **previous/next verse, play/pause and stop**. Reading pauses when headphones are unplugged or a call comes in, and resumes after the call.
+- **Settings → Listen:** speed (0.75×–1.5×), pitch, a voice picker per language (offline voices only), *read verse numbers*, a **Test voice** button, and a **Voice status** row per language: *Installed offline*, *Needs download* or *Engine missing*.
+- If a voice is missing, a guided dialog (in Filipino) explains how to install it, with buttons that open the voice installer and the phone's Text-to-speech settings. Other languages keep working.
 
 ### Search & navigation
 - **Type a reference and jump straight to it:** `juan 3:16`, `john 3:16`, `1 cor 13`, `awit 23`. The verse is scrolled into view and briefly highlighted.
@@ -57,11 +65,11 @@ Tap any verse to open the verse panel:
 
 ## Download & install
 
-1. Download **`BibliaKo-v1.2.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v2.0.0.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
 3. On first launch the app prepares the default Bible (a few seconds). Every other version is prepared the first time you select it.
 
-**Requirements:** Android 7.0 (API 24) or newer, and about 200 MB of free storage once all versions are installed.
+**Requirements:** Android 7.0 (API 24) or newer, and about 200 MB of free storage once all versions are installed. Reading aloud uses the phone's text-to-speech engine (for example *Speech Services by Google*, preinstalled on most phones) with a downloaded offline voice for each language.
 
 > The release APK is signed with a development key for direct installation. It is not distributed through Google Play.
 
@@ -90,6 +98,7 @@ All Bible texts remain the property of their respective copyright holders.
 | UI | Jetpack Compose, Material 3, Navigation Compose |
 | Storage | Room (SQLite) with an **FTS4** full-text index; Preferences DataStore |
 | Concurrency | Kotlin Coroutines & Flow |
+| Read aloud | Android `TextToSpeech` (on-device voices only), audio focus |
 | Architecture | MVVM, manual dependency injection (`AppContainer`) |
 | Build | Gradle 8.13 (Kotlin DSL), AGP 8.13, KSP, R8 minification |
 
@@ -98,6 +107,7 @@ All Bible texts remain the property of their respective copyright holders.
 - **Import:** each version ships as XML in `app/src/main/assets/bibles/`. On first use it is streamed through an `XmlPullParser` and inserted into Room in batches, together with an accent-folded FTS4 index for search.
 - **Fast navigation:** the reader pages over a flat index of all 1,189 chapters. Jumping to a verse first loads the target chapter into a shared in-memory cache, so the reader's first frame already shows the text.
 - **Fast search:** search results come back in Bible order straight from the FTS index and stop at the result limit, so even very common words return in well under a second.
+- **Read aloud:** a pure-Kotlin `TtsController` queues one verse at a time and follows the reader across chapters and books. The Android speech engine and audio focus sit behind small interfaces, so the logic is unit-tested on the JVM, including offline-voice selection and missing-engine handling.
 - **Your data is kept separate:** highlights live in their own database (`user.db`), so updating or re-importing a Bible never touches them.
 
 ## Building from source
@@ -111,7 +121,7 @@ sdk.dir=C\:\\path\\to\\Android\\Sdk
 ```bash
 ./gradlew assembleDebug          # debug APK  -> app/build/outputs/apk/debug/
 ./gradlew assembleRelease        # release APK -> app/build/outputs/apk/release/
-./gradlew :app:testDebugUnitTest # unit tests (49)
+./gradlew :app:testDebugUnitTest # unit tests (60)
 ```
 
 On Windows, use `gradlew.bat`. To run a single test class:

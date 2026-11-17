@@ -1,4 +1,4 @@
-﻿package com.example.biblia.domain.model
+package com.example.biblia.domain.model
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
@@ -218,4 +218,5 @@ data class AppSettings(
     val book: Int = 1,
     val chapter: Int = 1,
     val verse: Int = 0,
+    val tts: com.example.biblia.domain.tts.TtsPrefs = com.example.biblia.domain.tts.TtsPrefs(),
 )

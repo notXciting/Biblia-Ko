@@ -1,4 +1,4 @@
-﻿package com.example.biblia.di
+package com.example.biblia.di
 
 import android.content.Context
 import com.example.biblia.data.BibleVersion
@@ -11,9 +11,15 @@ import com.example.biblia.data.repository.ChapterCache
 import com.example.biblia.data.repository.SettingsRepository
 import com.example.biblia.data.user.HighlightRepository
 import com.example.biblia.data.user.UserDatabase
+import com.example.biblia.data.tts.AndroidPlaybackFocus
+import com.example.biblia.data.tts.AndroidTtsEngine
+import com.example.biblia.domain.tts.TtsController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 /**
  * Manual dependency injection container, owned by [com.example.biblia.BibleApplication].
@@ -51,4 +57,21 @@ class AppContainer(context: Context) {
         },
         onImported = { versionId: String -> bibleRepository.invalidateCounts(versionId) },
     )
+
+    /** Main-thread scope for "Listen" (TTS state and callbacks live here). */
+    private val mainScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+
+    /** "Listen": the TextToSpeech engine is created lazily on first use. */
+    val tts = TtsController(
+        engineFactory = { listener -> AndroidTtsEngine(appContext, listener) },
+        focus = AndroidPlaybackFocus(appContext),
+        source = { versionId, book, chapter -> chapterCache.get(versionId, book, chapter).verses },
+        scope = mainScope,
+    )
+
+    init {
+        mainScope.launch {
+            settingsRepository.settings.map { it.tts }.distinctUntilChanged().collect { tts.updatePrefs(it) }
+        }
+    }
 }

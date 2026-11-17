@@ -31,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -50,7 +51,12 @@ import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.catalog.BookCatalog
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.reference.ReferenceFormatter
+import com.example.biblia.domain.tts.TtsController
+import com.example.biblia.domain.tts.TtsState
+import com.example.biblia.domain.tts.TtsStatus
 import com.example.biblia.perf.VersePerf
+import com.example.biblia.ui.listen.ListenBar
 import kotlinx.coroutines.launch
 
 /**
@@ -71,6 +77,7 @@ fun ReaderScreen(
         factory = viewModelFactory { initializer { ReaderViewModel(container) } },
     )
     val importStates by container.importer.states.collectAsStateWithLifecycle()
+    val tts by container.tts.state.collectAsStateWithLifecycle()
 
     Column(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         ReaderTopBar(
@@ -79,6 +86,8 @@ fun ReaderScreen(
             onSettingsClick = onOpenSettings,
             onLocationClick = onOpenSelection,
             onVersionClick = { vm.openVersionSheet() },
+            listening = tts.isActive,
+            onListenClick = { if (tts.isActive) container.tts.stop() else vm.startListening() },
         )
         if (vm.ready) {
             key(vm.jumpId) {
@@ -86,7 +95,7 @@ fun ReaderScreen(
                     initialPage = vm.flatIndexOf(vm.book, vm.chapter),
                     pageCount = { vm.totalChapters },
                 )
-                ReaderBody(vm, settings, pagerState, Modifier.weight(1f))
+                ReaderBody(vm, settings, pagerState, tts, container.tts, Modifier.weight(1f))
             }
         }
     }
@@ -109,6 +118,8 @@ private fun ReaderBody(
     vm: ReaderViewModel,
     settings: AppSettings,
     pagerState: PagerState,
+    tts: TtsState,
+    listen: TtsController,
     modifier: Modifier,
 ) {
     val context = LocalContext.current
@@ -130,6 +141,18 @@ private fun ReaderBody(
         }
     }
 
+    // "Listen" rolled into another chapter: follow it. Remembered per pager
+    // build, so a jump (new pager) never pulls the reader back.
+    val followed = remember { mutableStateOf(tts.book to tts.chapter) }
+    LaunchedEffect(tts.book, tts.chapter) {
+        val pos = tts.book to tts.chapter
+        if (!tts.isActive || pos == followed.value) return@LaunchedEffect
+        followed.value = pos
+        val target = vm.flatIndexOf(tts.book, tts.chapter)
+        if (pagerState.currentPage != target) pagerState.animateScrollToPage(target)
+    }
+    val listening = tts.isActive && tts.versionId == vm.version.id
+
     Box(modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
@@ -147,9 +170,10 @@ private fun ReaderBody(
                 verseLayout = settings.verseLayout,
                 isCurrentPage = page == pagerState.currentPage,
                 vm = vm,
+                speakingVerse = if (listening && tts.book == b && tts.chapter == c) tts.verse else 0,
             )
         }
-        val showArrows = vm.selectedVerses.isEmpty()
+        val showArrows = vm.selectedVerses.isEmpty() && !listening
         PageArrow(
             visible = showArrows && pagerState.currentPage > 0,
             icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -163,6 +187,21 @@ private fun ReaderBody(
             description = stringResource(R.string.action_next_chapter),
             onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
             modifier = Modifier.align(Alignment.BottomEnd),
+        )
+        ListenBar(
+            visible = listening && vm.selectedVerses.isEmpty(),
+            reference = if (tts.verse > 0) {
+                ReferenceFormatter.format(BookCatalog.book(tts.book).displayName, tts.chapter, listOf(tts.verse))
+            } else "",
+            playing = tts.status == TtsStatus.PLAYING,
+            onPlayPause = { if (tts.status == TtsStatus.PLAYING) listen.pause() else listen.resume() },
+            onPrevious = { listen.previous() },
+            onNext = { listen.next() },
+            onStop = { listen.stop() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 20.dp),
         )
         val selected = vm.selectedVerses
         val chapterHighlights = remember(vm.book, vm.chapter) { vm.actions.highlights(vm.book, vm.chapter) }

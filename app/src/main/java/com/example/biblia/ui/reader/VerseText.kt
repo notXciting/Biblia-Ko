@@ -27,9 +27,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.AnnotatedString
@@ -149,6 +146,7 @@ fun ChapterFlowText(
     anchorVerse: Int = 0,
     onAnchorConsumed: () -> Unit = {},
     onTopVerse: ((Int) -> Unit)? = null,
+    speakingVerse: Int = 0,
     modifier: Modifier = Modifier,
 ) {
     // Scroll target: a highlighted jump verse, else a silent anchor (version switch).
@@ -165,6 +163,7 @@ fun ChapterFlowText(
         }
     }
     val selectionColor = accent.copy(alpha = 0.16f)
+    val speakingColor = accent.copy(alpha = 0.14f)
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
     var textTop by remember { mutableFloatStateOf(0f) }
     var scrolledFor by remember { mutableIntStateOf(0) }
@@ -174,6 +173,7 @@ fun ChapterFlowText(
     // there, so the user never sees the top of the chapter jump away.
     var positioned by remember { mutableStateOf(scrollTarget <= 0 || scrollState == null) }
     val margin = with(LocalDensity.current) { 32.dp.toPx() }
+    val listenBarReserve = with(LocalDensity.current) { 140.dp.toPx() }
 
     LaunchedEffect(Unit) {
         delay(300) // safety net: never stay hidden
@@ -197,6 +197,12 @@ fun ChapterFlowText(
         scrolledFor = scrollTarget
         positioned = true
         if (pulseVerse <= 0) onAnchorConsumed()
+    }
+    // "Listen": keep the verse being read in view (smooth; only when needed).
+    LaunchedEffect(flow, layout, speakingVerse) {
+        val l = layout ?: return@LaunchedEffect
+        val state = scrollState ?: return@LaunchedEffect
+        if (speakingVerse > 0) scrollToSpokenVerse(flow, l, state, speakingVerse, textTop, margin, listenBarReserve)
     }
     // Report the verse at the top of the viewport (same probe line the scroll
     // above targets, so switching back and forth never drifts).
@@ -229,41 +235,14 @@ fun ChapterFlowText(
             .onPlaced { textTop = it.positionInParent().y }
             .graphicsLayer { alpha = if (positioned) 1f else 0f }
             .drawBehind {
-                val alpha = pulse.value
                 val l = layout ?: return@drawBehind
+                val spoken = flow.numbers.indexOf(speakingVerse)
+                if (speakingVerse > 0 && spoken >= 0) drawVerseBoxes(l, flow.ranges[spoken], speakingColor)
+                val alpha = pulse.value
                 if (alpha <= 0f || pulseVerse <= 0) return@drawBehind
                 val index = flow.numbers.indexOf(pulseVerse)
                 if (index < 0) return@drawBehind
-                val range = flow.ranges[index]
-                val firstLine = l.getLineForOffset(range.first)
-                val lastLine = l.getLineForOffset(range.last)
-                val corner = 6.dp.toPx()
-                val fill = accent.copy(alpha = alpha)
-                for (line in firstLine..lastLine) {
-                    // Edges come from the verse's own first/last CHARACTER boxes.
-                    // (The cursor AFTER the last char lands at the start of the
-                    // next paragraph in verse-by-verse layout, x = 0, which
-                    // dropped the last line of the highlight.)
-                    val left = if (line == firstLine) {
-                        l.getBoundingBox(range.first).left
-                    } else {
-                        l.getLineLeft(line)
-                    }
-                    val right = if (line == lastLine) {
-                        l.getBoundingBox(range.last).right
-                    } else {
-                        l.getLineRight(line)
-                    }
-                    drawRoundRect(
-                        color = fill,
-                        topLeft = Offset(left, l.getLineTop(line)),
-                        size = Size(
-                            (right - left).coerceAtLeast(0f),
-                            l.getLineBottom(line) - l.getLineTop(line),
-                        ),
-                        cornerRadius = CornerRadius(corner, corner),
-                    )
-                }
+                drawVerseBoxes(l, flow.ranges[index], accent.copy(alpha = alpha))
             }
             .pointerInput(flow) {
                 detectTapGestures { position ->
