@@ -1,0 +1,6 @@
+# Keep the Unix Gradle wrapper runnable on macOS/Linux, the batch file on Windows.
+gradlew text eol=lf
+*.bat text eol=crlf
+# Binary assets
+*.png binary
+*.jar binary
