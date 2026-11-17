@@ -1,0 +1,28 @@
+# Baseline profile (best effort): main screens, ViewModels, data hot paths.
+# Invalid lines are ignored by the profile installer; this must never break the build.
+HSPLcom/example/biblia/BibleApplication;->onCreate()V
+HSPLcom/example/biblia/MainActivity;->onCreate(Landroid/os/Bundle;)V
+HSPLcom/example/biblia/ui/reader/ReaderViewModel;-><init>(Lcom/example/biblia/di/AppContainer;)V
+HSPLcom/example/biblia/ui/reader/ReaderViewModel;->loadChapter(Ljava/lang/String;IILkotlin/coroutines/Continuation;)Ljava/lang/Object;
+HSPLcom/example/biblia/ui/reader/ReaderViewModel;->openAt(Lcom/example/biblia/domain/model/VerseReference;)V
+HSPLcom/example/biblia/data/parser/TagalogXmlBibleParser;->parse(Ljava/io/InputStream;Lcom/example/biblia/data/parser/BibleParserListener;)V
+HSPLcom/example/biblia/domain/search/SnippetBuilder;->build(Ljava/lang/String;Ljava/util/List;I)Lcom/example/biblia/domain/search/VerseSnippet;
+HSPLcom/example/biblia/domain/reference/ReferenceParser;->parse(Ljava/lang/String;)Lcom/example/biblia/domain/model/VerseReference;
+Lcom/example/biblia/ui/reader/ReaderScreenKt;
+Lcom/example/biblia/ui/reader/ChapterPageKt;
+Lcom/example/biblia/ui/reader/VerseTextKt;
+Lcom/example/biblia/ui/reader/ReaderTopBarKt;
+Lcom/example/biblia/ui/reader/VerseActionBarKt;
+Lcom/example/biblia/ui/selection/SelectionScreenKt;
+Lcom/example/biblia/ui/selection/SelectionViewModel;
+Lcom/example/biblia/ui/selection/BookLevelKt;
+Lcom/example/biblia/ui/selection/ChapterLevelKt;
+Lcom/example/biblia/ui/selection/VerseLevelKt;
+Lcom/example/biblia/ui/selection/SearchResultsKt;
+Lcom/example/biblia/ui/settings/SettingsScreenKt;
+Lcom/example/biblia/data/db/BibleDao;
+Lcom/example/biblia/data/db/BibleDatabase;
+Lcom/example/biblia/data/repository/BibleRepository;
+Lcom/example/biblia/data/repository/SettingsRepository;
+Lcom/example/biblia/data/importer/BibleImporter;
+Lcom/example/biblia/data/catalog/BookCatalog;
