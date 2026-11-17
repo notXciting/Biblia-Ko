@@ -1,4 +1,4 @@
-﻿package com.example.biblia.ui
+package com.example.biblia.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -15,6 +15,7 @@ import com.example.biblia.data.importer.ImportState
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
 import com.example.biblia.ui.components.ImportLoadingScreen
+import com.example.biblia.ui.listen.VoiceHelpDialog
 
 /**
  * App shell: first-launch import gate ("Inihahanda ang Biblia... 42%") and then
@@ -31,6 +32,7 @@ fun AppRoot(container: AppContainer, modifier: Modifier = Modifier) {
         .collectAsStateWithLifecycle(initialValue = false)
     val importState = importStates[version.id] ?: ImportState(version.id)
     val ready = imported || importState.isDone
+    val tts by container.tts.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(version.id) {
         if (!ready) container.importer.ensureImportedAsync(version)
@@ -41,6 +43,10 @@ fun AppRoot(container: AppContainer, modifier: Modifier = Modifier) {
             BibleNavHost(container = container, settings = settings)
         } else {
             ImportLoadingScreen(percent = importState.percent)
+        }
+        // "Listen" can't speak this language offline (reader, Settings test or status row).
+        tts.voiceProblem?.let { problem ->
+            VoiceHelpDialog(problem = problem, onDismiss = { container.tts.dismissVoiceProblem() })
         }
     }
 }

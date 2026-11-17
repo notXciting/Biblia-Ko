@@ -1,4 +1,4 @@
-﻿package com.example.biblia
+package com.example.biblia
 
 import android.graphics.Color
 import android.os.Bundle
@@ -56,5 +56,11 @@ class MainActivity : ComponentActivity() {
         }
         // Request 60/90/120 Hz where the display supports it (guarded, never crashes).
         requestHighRefreshRate()
+    }
+
+    override fun onDestroy() {
+        // Leaving the app (not a rotation): stop "Listen" and free the engine.
+        if (isFinishing) (application as BibleApplication).container.tts.release()
+        super.onDestroy()
     }
 }

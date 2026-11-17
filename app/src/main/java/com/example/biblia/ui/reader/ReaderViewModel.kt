@@ -1,4 +1,4 @@
-﻿package com.example.biblia.ui.reader
+package com.example.biblia.ui.reader
 
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -15,6 +15,7 @@ import com.example.biblia.domain.model.BookNameLanguage
 import com.example.biblia.domain.model.ChapterContent
 import com.example.biblia.domain.model.HighlightColor
 import com.example.biblia.domain.reference.ReferenceFormatter
+import com.example.biblia.domain.tts.TtsStatus
 import com.example.biblia.domain.model.VerseReference
 import com.example.biblia.domain.model.VersionMeta
 import com.example.biblia.perf.VersePerf
@@ -145,6 +146,7 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         currentContent = cached
         jumpId++
         persistPosition()
+        followJumpWithListen(b, c, v)
         if (cached == null) viewModelScope.launch { loadCurrent() } else prefetchSoon()
     }
 
@@ -248,6 +250,7 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         val target = anchor.coerceAtMost(maxVerse)
 
         version = v
+        container.tts.onVersionChanged(v) // voice follows the version
         BookNameLanguage.english = v.isEnglish // same frame as the text switch
         chapterCounts = counts
         verseCounts = newVerseCounts
@@ -265,6 +268,22 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         persistPosition()
         reloadMeta()
         loadCurrent()
+    }
+
+    /** "Listen": from the first selected verse, else the verse at the top of the screen. */
+    fun startListening() {
+        val start = selectedVerses.minOrNull() ?: topVerse.takeIf { it > 0 } ?: 1
+        selectedVerses = emptySet()
+        container.tts.play(version, book, chapter, start)
+    }
+
+    /** A jump while reading aloud continues reading at the new place (paused: stop). */
+    private fun followJumpWithListen(b: Int, c: Int, verse: Int) {
+        when (container.tts.state.value.status) {
+            TtsStatus.PLAYING -> container.tts.play(version, b, c, verse.coerceAtLeast(1))
+            TtsStatus.PAUSED -> container.tts.stop()
+            TtsStatus.IDLE -> Unit
+        }
     }
 
     /** "Juan 3:16-18, 20" for the current selection (panel header, share text). */

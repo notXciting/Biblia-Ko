@@ -6,6 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.biblia.data.AppIconManager
+import com.example.biblia.data.BibleVersionRegistry
+import com.example.biblia.domain.tts.TtsVoice
+import com.example.biblia.domain.tts.VoiceStatus
 import com.example.biblia.data.catalog.BookCatalog
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AccentColor
@@ -37,6 +40,11 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
     var fontPreviewText by mutableStateOf<String?>(null); private set
     var fontPreviewReference by mutableStateOf<String?>(null); private set
 
+    /** Languages that have Bibles, each with its offline voices (Listen settings). */
+    val ttsLanguages: List<String> = BibleVersionRegistry.all.map { it.language }.distinct()
+    var ttsVoices by mutableStateOf<Map<String, List<TtsVoice>>>(emptyMap()); private set
+    var ttsStatus by mutableStateOf<Map<String, VoiceStatus>>(emptyMap()); private set
+
     init {
         viewModelScope.launch {
             val versionId = settingsRepo.initial().versionId
@@ -53,6 +61,29 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
                 fontPreviewText = john316.text
             }
         }
+    }
+
+    /** Re-checks installed voices (creates the TTS engine on first use). */
+    fun refreshVoices() {
+        viewModelScope.launch {
+            ttsStatus = ttsLanguages.associateWith { container.tts.voiceStatus(it) }
+            ttsVoices = ttsLanguages.associateWith { container.tts.voices(it) }
+        }
+    }
+
+    fun showVoiceHelp(language: String, status: VoiceStatus) = container.tts.showVoiceHelp(language, status)
+
+    fun setTtsRate(value: Float) { viewModelScope.launch { settingsRepo.setTtsRate(value) } }
+    fun setTtsPitch(value: Float) { viewModelScope.launch { settingsRepo.setTtsPitch(value) } }
+    fun setTtsSpeakNumbers(value: Boolean) { viewModelScope.launch { settingsRepo.setTtsSpeakNumbers(value) } }
+    fun setTtsVoice(language: String, voiceName: String?) {
+        viewModelScope.launch { settingsRepo.setTtsVoice(language, voiceName) }
+    }
+
+    /** Reads John 3:16 of the current Bible in its language's voice. */
+    fun testVoice(language: String) {
+        val text = listOfNotNull(fontPreviewReference, fontPreviewText).joinToString(". ")
+        container.tts.testVoice(language, text.ifBlank { "John 3:16" })
     }
 
     fun setVerseLayout(value: VerseLayout) {

@@ -3,6 +3,14 @@
 
     <!-- Deliberately NO permissions at all: the app is fully offline. -->
 
+    <!-- Package visibility (API 30+) so "Listen" can bind to the on-device
+         TextToSpeech engine and open its voice-data installer. Not a permission. -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE" />
+        </intent>
+    </queries>
+
     <application
         android:name=".BibleApplication"
         android:allowBackup="true"

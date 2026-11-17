@@ -1,4 +1,4 @@
-﻿package com.example.biblia.ui.reader
+package com.example.biblia.ui.reader
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -59,6 +59,7 @@ fun ChapterPage(
     isCurrentPage: Boolean,
     vm: ReaderViewModel,
     modifier: Modifier = Modifier,
+    speakingVerse: Int = 0,
 ) {
     val scrollState = rememberScrollState()
     val initial = remember(versionId, book, chapter) { vm.peekChapter(versionId, book, chapter) }
@@ -134,6 +135,7 @@ fun ChapterPage(
                 anchorVerse = if (isCurrentPage) vm.anchorVerse else 0,
                 onAnchorConsumed = { vm.consumeAnchor() },
                 onTopVerse = if (isCurrentPage) vm::onTopVerse else null,
+                speakingVerse = speakingVerse,
                 onVerseTap = { number ->
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     if (isCurrentPage) vm.tapVerse(number)

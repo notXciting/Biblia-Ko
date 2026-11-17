@@ -1,4 +1,4 @@
-﻿package com.example.biblia.data.repository
+package com.example.biblia.data.repository
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -17,6 +17,7 @@ import com.example.biblia.domain.model.SearchScope
 import com.example.biblia.domain.model.ThemeMode
 import com.example.biblia.domain.model.VerseLayout
 import com.example.biblia.domain.model.ViewMode
+import com.example.biblia.domain.tts.TtsPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -40,6 +41,10 @@ class SettingsRepository(private val context: Context) {
         val LAST_BOOK = intPreferencesKey("last_book")
         val LAST_CHAPTER = intPreferencesKey("last_chapter")
         val LAST_VERSE = intPreferencesKey("last_verse")
+        val TTS_RATE = floatPreferencesKey("tts_rate")
+        val TTS_PITCH = floatPreferencesKey("tts_pitch")
+        val TTS_NUMBERS = booleanPreferencesKey("tts_speak_numbers")
+        fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
 
@@ -59,6 +64,12 @@ class SettingsRepository(private val context: Context) {
             book = (p[Keys.LAST_BOOK] ?: 1).coerceIn(1, 66),
             chapter = (p[Keys.LAST_CHAPTER] ?: 1).coerceAtLeast(1),
             verse = (p[Keys.LAST_VERSE] ?: 0).coerceAtLeast(0),
+            tts = TtsPrefs(
+                rate = (p[Keys.TTS_RATE] ?: 1f).coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
+                pitch = (p[Keys.TTS_PITCH] ?: 1f).coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),
+                voices = TTS_LANGUAGES.mapNotNull { lang -> p[Keys.ttsVoice(lang)]?.let { lang to it } }.toMap(),
+                speakVerseNumbers = p[Keys.TTS_NUMBERS] ?: false,
+            ),
         )
     }
 
@@ -80,6 +91,17 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSearchScope(value: SearchScope) = edit { it[Keys.SEARCH_SCOPE] = value.name }
     suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
 
+    suspend fun setTtsRate(value: Float) =
+        edit { it[Keys.TTS_RATE] = value.coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE) }
+    suspend fun setTtsPitch(value: Float) =
+        edit { it[Keys.TTS_PITCH] = value.coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH) }
+    suspend fun setTtsSpeakNumbers(value: Boolean) = edit { it[Keys.TTS_NUMBERS] = value }
+
+    /** [voiceName] null = the engine's default voice for that language. */
+    suspend fun setTtsVoice(language: String, voiceName: String?) = edit {
+        if (voiceName == null) it.remove(Keys.ttsVoice(language)) else it[Keys.ttsVoice(language)] = voiceName
+    }
+
     /** Persists the last read position (verse == 0 means "no focused verse"). */
     suspend fun setPosition(book: Int, chapter: Int, verse: Int) = edit {
         it[Keys.LAST_BOOK] = book.coerceIn(1, 66)
@@ -93,6 +115,10 @@ class SettingsRepository(private val context: Context) {
         context.settingsStore.data.map { it[Keys.imported(versionId)] ?: false }
 
     suspend fun isImported(versionId: String): Boolean = isImportedFlow(versionId).first()
+
+    private companion object {
+        val TTS_LANGUAGES = BibleVersionRegistry.all.map { it.language }.distinct()
+    }
 
     private inline fun <reified T : Enum<T>> enumOrDefault(name: String?, default: T): T =
         name?.let { runCatching { enumValueOf<T>(it) }.getOrNull() } ?: default

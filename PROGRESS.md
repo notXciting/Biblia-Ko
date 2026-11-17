@@ -2,7 +2,32 @@
 
 Offline Tagalog Bible app: Kotlin + Jetpack Compose + Material 3, Room + FTS4, DataStore, manual DI, Navigation. Source: Tagalog2012Bible.xml (66 books / 1,189 chapters / 30,692 verses / 179 empty). Package com.example.biblia.
 
-## LATEST ROUND: "v1.2.0 prep" (2026-11-18)
+## LATEST ROUND: "v2.0.0 release" (2026-11-18)
+
+- v1.2.0 was pushed by the user manually. versionCode 3 / versionName 2.0.0. README: Listen section (offline read-aloud), requirements note, tech stack, how it works, 60 tests.
+- Release v2.0.0: BibliaKo-v2.0.0.apk (16.9 MB, debug-key signed), SHA-256 3501CEEA...908DF534. 60 tests pass.
+
+## PREVIOUS ROUND: "Listen: offline voice handling" (2026-11-18)
+
+- domain/tts/VoiceCheck (pure): offlineVoices (installed, !networkRequired, language fil/tl or en; ranked quality desc, latency asc), choose (user's voice if offline-usable else best offline), status -> VoiceStatus INSTALLED_OFFLINE / NEEDS_DOWNLOAD / ENGINE_MISSING (voices() == null = engine can't list voices -> language check decides).
+- TtsEngine.voices() now returns RAW voices (with networkRequired/installed/quality/latency); filtering is in VoiceCheck. AndroidTtsEngine reports onInit(false) when tts.engines is empty (no engine at all).
+- TtsController: resolve() runs on every play/version switch/test; anything but INSTALLED_OFFLINE raises TtsState.voiceProblem (VoiceProblem(language, status)) instead of the old missingLanguage. Every utterance passes an explicit OFFLINE voice name (default "Automatic (best offline)"), re-chosen per verse so a Settings change applies on the next verse; a saved network voice is ignored. voiceStatus(language), voices(language) (offline only), showVoiceHelp(), dismissVoiceProblem().
+- UI: VoiceHelpDialog (replaces MissingVoiceDialog) at AppRoot: Filipino text + 3 steps (Speech Services by Google -> Settings > Text-to-speech -> Install voice data), buttons: I-download ang boses (ACTION_INSTALL_TTS_DATA; Play Store listing when ENGINE_MISSING), Buksan ang Text-to-speech settings (com.android.settings.TTS_SETTINGS -> Settings fallback), Mamaya na. ui/listen/VoiceIntents.kt holds the intents with fallbacks.
+- Settings > Pakinggan: "Katayuan ng boses" rows per language (Naka-install (offline) / Kailangang i-download / Walang TTS engine), tap a non-ready row -> help dialog; refreshed on resume. Voice picker disabled until installed offline.
+- Tests: 60 pass (+4: network-only voices = needs download, no engine = engine missing, offline voice always chosen, VoiceCheck filter/rank/status). Release builds. NOT verified on device.
+
+## PREVIOUS ROUND: "Listen (text-to-speech)" (2026-11-18)
+
+- domain/tts (pure Kotlin): TtsController (verse-by-verse queue, empty verses skipped, chapter/book rollover via ChapterSteps, stops after Rev 22; utterance ids so stale "done" callbacks never advance; 3 consecutive engine errors -> stop), TtsEngine/PlaybackFocus/ChapterTextSource interfaces, TtsPrefs/TtsState, TtsLocales (Tagalog -> fil-PH then tl-PH, English -> en-US; voice picker filters by language code fil/tl or en).
+- data/tts: AndroidTtsEngine (TextToSpeech, QUEUE_FLUSH, USAGE_MEDIA/SPEECH; voices exclude network-only and not-installed), AndroidPlaybackFocus (AUDIOFOCUS_GAIN, pause-when-ducked; transient loss = pause + auto-resume, which also covers incoming calls without READ_PHONE_STATE; ACTION_AUDIO_BECOMING_NOISY -> pause).
+- AppContainer.tts on a Main.immediate scope; engine created lazily; prefs flow from DataStore. MainActivity.onDestroy (isFinishing) -> tts.release(). Manifest: <queries> TTS_SERVICE (not a permission).
+- Reader: headphones button in top bar (start from first selected verse, else top verse; tap again = stop); floating ListenBar (prev / play-pause / next / stop) replaces the page arrows; spoken verse tinted (accent 0.14, drawn in drawBehind via VerseDecor.drawVerseBoxes, shared with the pulse) and smoothly scrolled into view; pager follows chapter rollover (remembered per pager build so a jump never pulls back). Version switch -> tts.onVersionChanged (same verse, new voice); a jump while playing continues at the new place, while paused it stops.
+- Missing voice: AppRoot-level MissingVoiceDialog (per language, KeepAppLocale) with ACTION_INSTALL_TTS_DATA.
+- Settings "Pakinggan": speed 0.75-1.5x, pitch 0.75-1.25, voice per language (DropdownMenu, refreshed on resume), read verse numbers switch, Test voice (John 3:16 of current Bible). DataStore keys tts_rate, tts_pitch, tts_speak_numbers, tts_voice_<language>.
+- TtsControllerTest (7): order, skip empty, chapter+book rollover, empty chapter skip + end of Bible, version switch, missing language only, next/prev/pause/resume/verse numbers. 56 tests pass; release builds. lintDebug has 2 PRE-EXISTING errors (local.properties escaping, app_name MissingTranslation).
+- NOT verified on device (no TTS run by me).
+
+## PREVIOUS ROUND: "v1.2.0 prep" (2026-11-18)
 
 - versionCode 2 / versionName 1.2.0 (app/build.gradle.kts). README updated: ten versions (CSB, HCSB, KJV, NKJV, NLT added to the table), v1.2.0 badge/APK name, ~200 MB storage.
 - Release APK built (16.8 MB, debug-key signed), SHA-256 90d94509...7359f3e0a. 49 tests pass. Committed locally.

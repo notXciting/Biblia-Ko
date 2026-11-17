@@ -1,4 +1,4 @@
-﻿package com.example.biblia.ui.settings
+package com.example.biblia.ui.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -143,6 +143,20 @@ fun SettingsScreen(
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     vm.setVerseLayout(value)
                 },
+            )
+            Spacer(Modifier.height(8.dp))
+            ListenSection(
+                prefs = settings.tts,
+                languages = vm.ttsLanguages,
+                voices = vm.ttsVoices,
+                status = vm.ttsStatus,
+                onRefresh = { vm.refreshVoices() },
+                onVoiceHelp = { language, status -> vm.showVoiceHelp(language, status) },
+                onRate = { vm.setTtsRate(it) },
+                onPitch = { vm.setTtsPitch(it) },
+                onVoice = { language, name -> vm.setTtsVoice(language, name) },
+                onSpeakNumbers = { vm.setTtsSpeakNumbers(it) },
+                onTest = { vm.testVoice(BibleVersionRegistry.byId(settings.versionId).language) },
             )
             Spacer(Modifier.height(8.dp))
             AboutSection(currentVersionId = settings.versionId)
