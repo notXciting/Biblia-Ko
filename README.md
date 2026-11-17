@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v1.0.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v1.2.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -20,12 +20,12 @@
   <img src="docs/screenshots/compare.png" width="200" alt="Compare versions">
 </p>
 
-Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles five translations, searches across the whole Bible quickly, and opens any verse instantly.
+Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles ten translations (two Tagalog, eight English), searches across the whole Bible quickly, and opens any verse instantly.
 
 ## Features
 
 ### Reading
-- **Five Bible versions** in Tagalog and English, switchable at any time. The reader **stays on the verse you are reading** when you switch.
+- **Ten Bible versions** in Tagalog and English, switchable at any time. The reader **stays on the verse you are reading** when you switch.
 - **Swipe between chapters**, or use the page arrows. Your place is remembered between sessions.
 - **Two verse layouts:** a flowing *Paragraph* or *Verse by verse*, each verse on its own line.
 - Serif reading font, adjustable **font size** and **line spacing**, with live previews in Settings.
@@ -57,11 +57,11 @@ Tap any verse to open the verse panel:
 
 ## Download & install
 
-1. Download **`BibliaKo-v1.0.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v1.2.0.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
 3. On first launch the app prepares the default Bible (a few seconds). Every other version is prepared the first time you select it.
 
-**Requirements:** Android 7.0 (API 24) or newer, and about 100 MB of free storage once all versions are installed.
+**Requirements:** Android 7.0 (API 24) or newer, and about 200 MB of free storage once all versions are installed.
 
 > The release APK is signed with a development key for direct installation. It is not distributed through Google Play.
 
@@ -72,8 +72,13 @@ Tap any verse to open the verse panel:
 | **MBB12** | Magandang Balita Biblia (2012) | Tagalog | New Testament © 2012, Old Testament © 2005 Philippine Bible Society |
 | **ASD** | Ang Salita ng Dios (2015) | Tagalog | © 2009, 2011, 2014, 2015 Biblica, Inc. |
 | **AMP** | Amplified Bible | English | © 2015 The Lockman Foundation |
+| **CSB** | Christian Standard Bible | English | © 2017 Holman Bible Publishers |
 | **ESV** | English Standard Version | English | © 2001 Crossway Bibles (Text Edition 2016) |
+| **HCSB** | Holman Christian Standard Bible | English | © 2004 Holman Bible Publishers |
+| **KJV** | King James Version | English | Public domain |
 | **NIV** | New International Version | English | © 1973, 1978, 1984, 2011 Biblica, Inc. |
+| **NKJV** | New King James Version | English | © 1982 Thomas Nelson |
+| **NLT** | New Living Translation | English | © 1996, 2004, 2015 Tyndale House Foundation |
 
 All Bible texts remain the property of their respective copyright holders.
 

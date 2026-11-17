@@ -61,9 +61,10 @@ class EnglishBiblesParserTest {
     }
 
     @Test
-    fun englishVersionsHaveRegistryCopyright() {
-        BibleVersionRegistry.all.filter { it.language == "English" }.forEach {
-            assertTrue(it.id, it.copyright.contains("Copyright"))
+    fun everyVersionHasACopyrightOrPublicDomainNotice() {
+        BibleVersionRegistry.all.forEach {
+            val notice = it.copyright
+            assertTrue(it.id, notice.contains("Copyright") || notice.contains("©") || notice.contains("Public domain"))
         }
     }
 }
