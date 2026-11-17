@@ -2,7 +2,26 @@
 
 Offline Tagalog Bible app: Kotlin + Jetpack Compose + Material 3, Room + FTS4, DataStore, manual DI, Navigation. Source: Tagalog2012Bible.xml (66 books / 1,189 chapters / 30,692 verses / 179 empty). Package com.example.biblia.
 
-## LATEST ROUND: "GitHub repo, README, v1.0.0 release" (2026-11-17)
+## LATEST ROUND: "v1.2.0 prep" (2026-11-18)
+
+- versionCode 2 / versionName 1.2.0 (app/build.gradle.kts). README updated: ten versions (CSB, HCSB, KJV, NKJV, NLT added to the table), v1.2.0 badge/APK name, ~200 MB storage.
+- Release APK built (16.8 MB, debug-key signed), SHA-256 90d94509...7359f3e0a. 49 tests pass. Committed locally.
+- NOT pushed / no GitHub release yet: the repo is now PUBLIC (created private; changed outside this session) and holds copyrighted Bible XML — waiting for the user's decision.
+
+## PREVIOUS ROUND: "Version sheet jumps during first import" (2026-11-18)
+
+- BUG: tapping a not-yet-imported version made the version sheet slide down and hide that row, so the progress was invisible. Cause: the progress bar was an AnimatedVisibility BELOW the row (content height grew while animating) and the ModalBottomSheet was half-expanded, which re-anchors/slides whenever content height changes.
+- FIX (VersionSheet.kt): sheet opens fully expanded (skipPartiallyExpanded = true) and import progress is DRAWN in the row (drawBehind: 12% primary fill growing left->right + 3dp bottom line, animated) with "Inihahanda… N%" in the subtitle — row height never changes. 49 tests pass; release installed. Not verified on device by me (needs an import on the user's phone) — user to confirm.
+
+## PREVIOUS ROUND: "Five more English versions" (2026-11-18)
+
+- Registered CSB, HCSB, KJV, NKJV, NLT (EnglishCSBBible/EnglishHCSBBible/EnglishKJBible/EnglishNKJBible/EnglishNLTBible.xml). Registry order: MBB12, ASD, then English alphabetically (AMP, CSB, ESV, HCSB, KJV, NIV, NKJV, NLT) — version sheet, About and Compare follow it.
+- All 5 files validated: 66 books / 1189 chapters in canonical order (FTS docid ordering relies on it), 31,101-31,103 verses, no empty verses, no nested tags, John 3:16 present.
+- Copyright notices: CSB/HCSB/NKJV from the XML headers; KJV "Public domain"; NLT has no header line -> standard Tyndale notice used (confirm edition). HCSB header says "Copyrighted Only For Website" (redistribution caveat, told the user).
+- VersionSheet list is now vertically scrollable (10 versions no longer fit). Test renamed to everyVersionHasACopyrightOrPublicDomainNotice (KJV has no "Copyright"). 49 tests pass. Release APK 9.5 -> 16.0 MB; installed on device (not driven — phone may be in use).
+- NOT committed/pushed yet (awaiting user). Next GitHub release needs versionCode 2 / versionName 1.1.0.
+
+## PREVIOUS ROUND: "GitHub repo, README, v1.0.0 release" (2026-11-17)
 
 - Private repo: https://github.com/notXciting/Biblia-Ko (branch main). .gitignore also excludes *.log, .kotlin, .claude/settings.local.json; .gitattributes pins gradlew to LF.
 - README.md (features, install, version copyrights, tech stack, build steps) with 8 screenshots in docs/screenshots (540px wide).
