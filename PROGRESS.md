@@ -2,7 +2,13 @@
 
 Offline Tagalog Bible app: Kotlin + Jetpack Compose + Material 3, Room + FTS4, DataStore, manual DI, Navigation. Source: Tagalog2012Bible.xml (66 books / 1,189 chapters / 30,692 verses / 179 empty). Package com.example.biblia.
 
-## LATEST ROUND: "Theme + accent overhaul (contrast-verified)" (2026-11-17)
+## LATEST ROUND: "GitHub repo, README, v1.0.0 release" (2026-11-17)
+
+- Private repo: https://github.com/notXciting/Biblia-Ko (branch main). .gitignore also excludes *.log, .kotlin, .claude/settings.local.json; .gitattributes pins gradlew to LF.
+- README.md (features, install, version copyrights, tech stack, build steps) with 8 screenshots in docs/screenshots (540px wide).
+- Release v1.0.0 (tag on b98a708): asset BibliaKo-v1.0.0.apk (9.5 MB, versionCode 1, minSdk 24, signed with the DEBUG key), SHA-256 32A4AE7E...301B1E. For the next release bump versionCode/versionName in app/build.gradle.kts first.
+
+## PREVIOUS ROUND: "Theme + accent overhaul (contrast-verified)" (2026-11-17)
 
 - Analysis (WCAG, 4.5:1 for accent text): of the old 8 accents only BLUE and RED passed everywhere; ORANGE failed light/sepia/button (2.6-3.1), TEAL light/sepia, GREEN sepia, PURPLE/PINK/INDIGO dark (the 25% lerp toward white was not enough).
 - AccentColor now has TWO hand-tuned tones per hue (light, dark; `tone(dark)`): BLUE, INDIGO, PURPLE, PINK, RED, AMBER(Gold, new), BROWN(new), GREEN, TEAL, GRAPHITE(new). ORANGE removed (saved ORANGE falls back to BLUE). Swatches (2 rows of 5) are drawn in the tone the current theme uses.
