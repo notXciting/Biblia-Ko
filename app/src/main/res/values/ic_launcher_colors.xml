@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mid-tones of each icon's background (hidden under the opaque foregrounds). -->
+    <color name="ic_launcher_background">#FF7A1E</color>
+    <color name="ic_launcher_dark_background">#0B0E17</color>
+    <color name="ic_launcher_sky_background">#5CB8F5</color>
+</resources>

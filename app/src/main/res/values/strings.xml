@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Default (Filipino / Tagalog) strings. Add values-en/strings.xml later for English. -->
+<resources>
+    <string name="app_name">Biblia Ko</string>
+
+    <!-- ===== Karaniwang aksyon ===== -->
+    <string name="action_back">Bumalik</string>
+    <string name="action_close">Isara</string>
+    <string name="action_cancel">Kanselahin</string>
+    <string name="action_copy">Kopyahin</string>
+    <string name="action_share">Ibahagi</string>
+    <string name="action_open_chapter">Buksan ang kabanata</string>
+    <string name="action_settings">Mga setting</string>
+    <string name="action_select_location">Pumili ng aklat, kabanata, o talata</string>
+    <string name="action_select_version">Pumili ng bersyon ng Biblia</string>
+    <string name="action_filter">Salain</string>
+    <string name="action_search">Maghanap</string>
+    <string name="action_clear_search">Burahin ang hinahanap</string>
+    <string name="action_toggle_view">Palitan ang pagtingin sa pagitan ng listahan at grid</string>
+    <string name="action_previous_chapter">Naunang kabanata</string>
+    <string name="action_next_chapter">Susunod na kabanata</string>
+
+    <!-- ===== Unang pag-import ===== -->
+    <string name="import_preparing">Inihahanda ang Biblia…</string>
+    <string name="import_subtitle">Isang beses lamang itong gagawin sa bawat bersyon.</string>
+    <string name="import_percent">%1$d%%</string>
+
+    <!-- ===== Mambabasa ===== -->
+    <string name="reader_chapter_heading">%1$s %2$d</string>
+    <string name="reader_verse_reference">%1$s %2$d:%3$d</string>
+    <string name="reader_selected_count">%1$d napili</string>
+    <string name="reader_copied_toast">Nakopya sa clipboard</string>
+    <string name="reader_copyright_heading">Tungkol sa saling-wikang ito</string>
+    <string name="cd_location_pill">Pumili ng aklat, kabanata, o talata</string>
+    <string name="cd_version_chip">Pumili ng bersyon ng Biblia</string>
+    <string name="cd_settings">Buksan ang mga setting</string>
+    <string name="cd_copy">Kopyahin ang mga napiling talata</string>
+    <string name="cd_share">Ibahagi ang mga napiling talata</string>
+    <string name="cd_clear_selection">Kanselahin ang pagpili ng talata</string>
+    <string name="cd_verse_number">Talata %1$d</string>
+    <string name="cd_empty_verse">Talata %1$d, walang nilalaman sa saling-wikang ito</string>
+
+    <!-- ===== Mga bersyon ===== -->
+    <string name="versions_title">Mga Bersyon</string>
+    <string name="version_installed">Naka-install</string>
+    <string name="version_preparing">Inihahanda… %1$d%%</string>
+
+    <!-- ===== Pagpili ng aklat / kabanata / talata ===== -->
+    <string name="selection_breadcrumb_books">Mga Aklat</string>
+    <string name="selection_chapter_breadcrumb">Kabanata %1$d</string>
+    <string name="selection_book_chapter_count">%1$d kabanata</string>
+    <string name="filter_all">Lahat</string>
+    <string name="filter_old_testament">Lumang Tipan</string>
+    <string name="filter_new_testament">Bagong Tipan</string>
+    <string name="filter_law">Kautusan</string>
+    <string name="filter_history">Kasaysayan</string>
+    <string name="filter_poetry">Mga Tula at Karunungan</string>
+    <string name="filter_major_prophets">Mga Dakilang Propeta</string>
+    <string name="filter_minor_prophets">Mga Maliit na Propeta</string>
+    <string name="filter_gospels">Mga Ebanghelyo</string>
+    <string name="filter_pauls_letters">Mga Sulat ni Pablo</string>
+    <string name="filter_general_letters">Mga Pangkalahatang Sulat</string>
+    <string name="filter_all_letters">Lahat ng Sulat</string>
+    <string name="filter_narrative">Mga Salaysay</string>
+    <string name="filter_prophecy">Propesiya</string>
+    <string name="filter_prison_letters">Mga Sulat mula sa Bilangguan</string>
+    <string name="filter_pastoral_letters">Mga Sulat Pastoral</string>
+    <string name="filter_one_chapter">Isang Kabanata Lamang</string>
+    <string name="filter_title">Salain ang mga aklat</string>
+    <string name="filter_group_general">Pangkalahatan</string>
+    <string name="filter_group_themes">Mga Tema</string>
+    <string name="filter_book_count">%1$d aklat</string>
+    <string name="filter_clear">Alisin ang filter</string>
+    <string name="search_hint">Maghanap o mag-type ng sanggunian (hal. Juan 3:16)</string>
+    <string name="search_jump_to">Pumunta sa %1$s</string>
+    <string name="search_result_count">%1$d resulta</string>
+    <string name="search_no_results">Walang nahanap</string>
+    <string name="search_no_results_hint">Subukan ang ibang salita, o sanggunian tulad ng “Juan 3:16”, “1 cor 13”.</string>
+    <string name="cd_book_number">Aklat %1$d</string>
+
+    <!-- ===== Mga setting ===== -->
+    <string name="settings_title">Mga Setting</string>
+    <string name="settings_theme">Tema</string>
+    <string name="theme_light">Maliwanag</string>
+    <string name="theme_dark">Madilim</string>
+    <string name="theme_sepia">Sepia</string>
+    <string name="theme_system">Sistema</string>
+    <string name="settings_accent_color">Kulay ng accent</string>
+    <string name="settings_font_size">Laki ng font</string>
+    <string name="settings_font_small_label">A</string>
+    <string name="settings_font_large_label">A</string>
+    <string name="cd_font_small">Maliit na laki ng font</string>
+    <string name="cd_font_large">Malaking laki ng font</string>
+    <string name="settings_font_preview">Live na preview</string>
+    <string name="settings_font_value">%1$d sp</string>
+    <string name="settings_line_spacing">Espasyo ng linya</string>
+    <string name="spacing_compact">Siksik</string>
+    <string name="spacing_normal">Normal</string>
+    <string name="spacing_relaxed">Maluwag</string>
+    <string name="settings_about">Tungkol</string>
+    <string name="settings_app_version">Bersyon ng app</string>
+    <string name="settings_developer">Gumawa</string>
+    <string name="settings_bible_versions">Mga Bersyon ng Biblia</string>
+    <string name="settings_version_in_use">ginagamit</string>
+    <string name="font_preview_reference">Juan 3:16</string>
+    <string name="font_preview_text">Sapagkat pinakamahal ng Diyos ang sangkatauhan na ibinigay niya ang kaniyang kaisa-isang Anak, upang ang bawat sumampalataya sa kaniya ay hindi mapahamak, kundi magkaroon ng buhay na walang hanggan.</string>
+    <string name="cd_accent_blue">Asul</string>
+    <string name="cd_accent_green">Berde</string>
+    <string name="cd_accent_purple">Lila</string>
+    <string name="cd_accent_red">Pula</string>
+    <string name="cd_accent_teal">Teal</string>
+    <string name="cd_accent_pink">Rosas</string>
+    <string name="cd_accent_indigo">Indigo</string>
+    <string name="search_truncated">May mga resulta pa…</string>
+    <string name="scope_text">Teksto</string>
+    <string name="book_search_empty">Walang aklat na nahanap</string>
+
+    <!-- ===== Wika ng app ===== -->
+    <string name="settings_language">Wika ng app</string>
+    <string name="language_follow_version">Sundan ang Biblia</string>
+    <string name="language_follow_hint">Sinusundan ang wika ng napiling Biblia (%1$s).</string>
+    <!-- ===== Icon ng app ===== -->
+    <string name="settings_app_icon">Icon ng app</string>
+    <string name="settings_app_icon_hint">Maaaring tumagal nang ilang segundo bago magbago ang icon sa home screen.</string>
+    <string name="app_icon_sunrise">Bukang-liwayway</string>
+    <string name="app_icon_night">Gabi</string>
+    <string name="app_icon_sky">Langit</string>
+
+    <!-- ===== Mga aksyon sa talata ===== -->
+    <string name="verse_action_compare">Ihambing</string>
+    <string name="verse_action_remove_highlight">Alisin ang marka</string>
+    <string name="compare_title">Ihambing ang mga bersyon</string>
+    <string name="compare_not_installed">Hindi pa naka-install. Piliin ito sa listahan ng mga bersyon para ma-install.</string>
+    <!-- ===== Pagkakaayos ng talata ===== -->
+    <string name="settings_verse_layout">Pagkakaayos ng mga talata</string>
+    <string name="verse_layout_paragraph">Tuloy-tuloy</string>
+    <string name="verse_layout_separate">Bawat talata</string>
+    <string name="theme_sage">Luntian</string>
+    <string name="theme_slate">Takipsilim</string>
+    <string name="theme_midnight">Hatinggabi</string>
+    <string name="cd_accent_amber">Ginto</string>
+    <string name="cd_accent_brown">Kayumanggi</string>
+    <string name="cd_accent_graphite">Abo</string>
+</resources>

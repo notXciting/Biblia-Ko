@@ -1,0 +1,88 @@
+package com.example.biblia.data.catalog
+
+import com.example.biblia.domain.model.BookInfo
+import com.example.biblia.domain.model.BookSection
+import com.example.biblia.domain.model.Testament
+
+/** The 66 books in canonical order with Tagalog (MBB) and English names. */
+internal object BookCatalogData {
+
+    val entries: List<BookInfo> = listOf(
+        entry(1, "Genesis", "Genesis", "Gen"),
+        entry(2, "Exodo", "Exodus", "Exo"),
+        entry(3, "Levitico", "Leviticus", "Lev"),
+        entry(4, "Mga Bilang", "Numbers", "Bil"),
+        entry(5, "Deuteronomio", "Deuteronomy", "Deu"),
+        entry(6, "Josue", "Joshua", "Jos"),
+        entry(7, "Mga Hukom", "Judges", "Huk"),
+        entry(8, "Ruth", "Ruth", "Rut"),
+        entry(9, "1 Samuel", "1 Samuel", "1 Sam"),
+        entry(10, "2 Samuel", "2 Samuel", "2 Sam"),
+        entry(11, "1 Mga Hari", "1 Kings", "1 Hari"),
+        entry(12, "2 Mga Hari", "2 Kings", "2 Hari"),
+        entry(13, "1 Mga Cronica", "1 Chronicles", "1 Cron"),
+        entry(14, "2 Mga Cronica", "2 Chronicles", "2 Cron"),
+        entry(15, "Ezra", "Ezra", "Ezra"),
+        entry(16, "Nehemias", "Nehemiah", "Neh"),
+        entry(17, "Ester", "Esther", "Est"),
+        entry(18, "Job", "Job", "Job"),
+        entry(19, "Mga Awit", "Psalms", "Awit"),
+        entry(20, "Mga Kawikaan", "Proverbs", "Kaw"),
+        entry(21, "Mangangaral", "Ecclesiastes", "Mang"),
+        entry(22, "Awit ni Solomon", "Song of Solomon", "Sng"),
+        entry(23, "Isaias", "Isaiah", "Isa"),
+        entry(24, "Jeremias", "Jeremiah", "Jer"),
+        entry(25, "Mga Panaghoy", "Lamentations", "Pan"),
+        entry(26, "Ezekiel", "Ezekiel", "Ezek"),
+        entry(27, "Daniel", "Daniel", "Dan"),
+        entry(28, "Oseas", "Hosea", "Os"),
+        entry(29, "Joel", "Joel", "Joel"),
+        entry(30, "Amos", "Amos", "Amos"),
+        entry(31, "Obadias", "Obadiah", "Obad"),
+        entry(32, "Jonas", "Jonah", "Jon"),
+        entry(33, "Mikas", "Micah", "Mik"),
+        entry(34, "Nahum", "Nahum", "Nah"),
+        entry(35, "Habakuk", "Habakkuk", "Hab"),
+        entry(36, "Zefanias", "Zephaniah", "Zef"),
+        entry(37, "Hagai", "Haggai", "Hag"),
+        entry(38, "Zacarias", "Zechariah", "Zac"),
+        entry(39, "Malakias", "Malachi", "Mal"),
+        entry(40, "Mateo", "Matthew", "Mat"),
+        entry(41, "Marcos", "Mark", "Mar"),
+        entry(42, "Lucas", "Luke", "Luk"),
+        entry(43, "Juan", "John", "Jn"),
+        entry(44, "Mga Gawa", "Acts", "Gawa"),
+        entry(45, "Roma", "Romans", "Rom"),
+        entry(46, "1 Corinto", "1 Corinthians", "1 Cor"),
+        entry(47, "2 Corinto", "2 Corinthians", "2 Cor"),
+        entry(48, "Galacia", "Galatians", "Gal"),
+        entry(49, "Efeso", "Ephesians", "Efe"),
+        entry(50, "Filipos", "Philippians", "Fil"),
+        entry(51, "Colosas", "Colossians", "Col"),
+        entry(52, "1 Tesalonica", "1 Thessalonians", "1 Tes"),
+        entry(53, "2 Tesalonica", "2 Thessalonians", "2 Tes"),
+        entry(54, "1 Timoteo", "1 Timothy", "1 Tim"),
+        entry(55, "2 Timoteo", "2 Timothy", "2 Tim"),
+        entry(56, "Tito", "Titus", "Tit"),
+        entry(57, "Filemon", "Philemon", "File"),
+        entry(58, "Hebreo", "Hebrews", "Heb"),
+        entry(59, "Santiago", "James", "Sant"),
+        entry(60, "1 Pedro", "1 Peter", "1 Ped"),
+        entry(61, "2 Pedro", "2 Peter", "2 Ped"),
+        entry(62, "1 Juan", "1 John", "1 Jn"),
+        entry(63, "2 Juan", "2 John", "2 Jn"),
+        entry(64, "3 Juan", "3 John", "3 Jn"),
+        entry(65, "Judas", "Jude", "Jud"),
+        entry(66, "Pahayag", "Revelation", "Rev"),
+    )
+
+    private fun entry(number: Int, tagalog: String, english: String, abbreviation: String) =
+        BookInfo(
+            number = number,
+            tagalogName = tagalog,
+            englishName = english,
+            abbreviation = abbreviation,
+            testament = if (number <= 39) Testament.OLD else Testament.NEW,
+            section = BookSection.of(number),
+        )
+}

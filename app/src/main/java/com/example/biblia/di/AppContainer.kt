@@ -1,0 +1,54 @@
+﻿package com.example.biblia.di
+
+import android.content.Context
+import com.example.biblia.data.BibleVersion
+import com.example.biblia.data.db.BibleDatabase
+import com.example.biblia.data.importer.BibleImporter
+import com.example.biblia.data.parser.BibleParser
+import com.example.biblia.data.parser.TagalogXmlBibleParser
+import com.example.biblia.data.repository.BibleRepository
+import com.example.biblia.data.repository.ChapterCache
+import com.example.biblia.data.repository.SettingsRepository
+import com.example.biblia.data.user.HighlightRepository
+import com.example.biblia.data.user.UserDatabase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+
+/**
+ * Manual dependency injection container, owned by [com.example.biblia.BibleApplication].
+ * [navigationBus] is THE single navigation bus shared by the reader and selection
+ * ViewModels; [chapterCache] is the shared LRU used for pre-jump preload.
+ */
+class AppContainer(context: Context) {
+
+    val appContext: Context = context.applicationContext
+
+    val database: BibleDatabase = BibleDatabase.build(appContext)
+    val settingsRepository = SettingsRepository(appContext)
+    val bibleRepository = BibleRepository(database.bibleDao())
+    val navigationBus = NavigationBus()
+
+    /** Application-wide background scope for fire-and-forget preloads. */
+    val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    val chapterCache = ChapterCache(bibleRepository)
+
+    /** User data (highlights): separate DB that is never destructively migrated. */
+    val userDatabase: UserDatabase = UserDatabase.build(appContext)
+    val highlightRepository = HighlightRepository(userDatabase.highlightDao())
+
+    private val parsers: Map<String, BibleParser> = mapOf(
+        BibleVersion.FORMAT_TAGALOG_XML to TagalogXmlBibleParser(),
+    )
+
+    val importer = BibleImporter(
+        context = appContext,
+        database = database,
+        settings = settingsRepository,
+        parserSelector = { version: BibleVersion ->
+            parsers[version.formatId] ?: TagalogXmlBibleParser()
+        },
+        onImported = { versionId: String -> bibleRepository.invalidateCounts(versionId) },
+    )
+}

@@ -1,0 +1,99 @@
+﻿package com.example.biblia.data.repository
+
+import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
+import com.example.biblia.data.BibleVersionRegistry
+import com.example.biblia.domain.model.AccentColor
+import com.example.biblia.domain.model.AppIcon
+import com.example.biblia.domain.model.AppLanguage
+import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.model.LineSpacing
+import com.example.biblia.domain.model.SearchScope
+import com.example.biblia.domain.model.ThemeMode
+import com.example.biblia.domain.model.VerseLayout
+import com.example.biblia.domain.model.ViewMode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+
+private val Context.settingsStore by preferencesDataStore(name = "bible_settings")
+
+/** All user preferences, persisted with Preferences DataStore. */
+class SettingsRepository(private val context: Context) {
+
+    private object Keys {
+        val APP_LANGUAGE = stringPreferencesKey("app_language")
+        val APP_ICON = stringPreferencesKey("app_icon")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
+        val ACCENT = stringPreferencesKey("accent_color")
+        val FONT_SIZE = floatPreferencesKey("font_size_sp")
+        val LINE_SPACING = stringPreferencesKey("line_spacing")
+        val VERSE_LAYOUT = stringPreferencesKey("verse_layout")
+        val VIEW_MODE = stringPreferencesKey("view_mode")
+        val SEARCH_SCOPE = stringPreferencesKey("search_scope")
+        val VERSION_ID = stringPreferencesKey("version_id")
+        val LAST_BOOK = intPreferencesKey("last_book")
+        val LAST_CHAPTER = intPreferencesKey("last_chapter")
+        val LAST_VERSE = intPreferencesKey("last_verse")
+        fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
+    }
+
+    /** Reactive settings stream (safe to observe from the UI). */
+    val settings: Flow<AppSettings> = context.settingsStore.data.map { p ->
+        AppSettings(
+            appLanguage = enumOrDefault(p[Keys.APP_LANGUAGE], AppLanguage.FOLLOW_VERSION),
+            appIcon = enumOrDefault(p[Keys.APP_ICON], AppIcon.SUNRISE),
+            themeMode = enumOrDefault(p[Keys.THEME_MODE], ThemeMode.SYSTEM),
+            accent = enumOrDefault(p[Keys.ACCENT], AccentColor.BLUE),
+            fontSizeSp = (p[Keys.FONT_SIZE] ?: 18f).coerceIn(12f, 32f),
+            lineSpacing = enumOrDefault(p[Keys.LINE_SPACING], LineSpacing.NORMAL),
+            verseLayout = enumOrDefault(p[Keys.VERSE_LAYOUT], VerseLayout.PARAGRAPH),
+            viewMode = enumOrDefault(p[Keys.VIEW_MODE], ViewMode.LIST),
+            searchScope = enumOrDefault(p[Keys.SEARCH_SCOPE], SearchScope.ALL),
+            versionId = p[Keys.VERSION_ID] ?: BibleVersionRegistry.default.id,
+            book = (p[Keys.LAST_BOOK] ?: 1).coerceIn(1, 66),
+            chapter = (p[Keys.LAST_CHAPTER] ?: 1).coerceAtLeast(1),
+            verse = (p[Keys.LAST_VERSE] ?: 0).coerceAtLeast(0),
+        )
+    }
+
+    /** One-shot read used to initialize ViewModels without write/observe loops. */
+    suspend fun initial(): AppSettings = settings.first()
+
+    private suspend fun edit(block: (androidx.datastore.preferences.core.MutablePreferences) -> Unit) {
+        context.settingsStore.edit { block(it) }
+    }
+
+    suspend fun setAppLanguage(value: AppLanguage) = edit { it[Keys.APP_LANGUAGE] = value.name }
+    suspend fun setAppIcon(value: AppIcon) = edit { it[Keys.APP_ICON] = value.name }
+    suspend fun setThemeMode(value: ThemeMode) = edit { it[Keys.THEME_MODE] = value.name }
+    suspend fun setAccent(value: AccentColor) = edit { it[Keys.ACCENT] = value.name }
+    suspend fun setFontSizeSp(value: Float) = edit { it[Keys.FONT_SIZE] = value.coerceIn(12f, 32f) }
+    suspend fun setLineSpacing(value: LineSpacing) = edit { it[Keys.LINE_SPACING] = value.name }
+    suspend fun setVerseLayout(value: VerseLayout) = edit { it[Keys.VERSE_LAYOUT] = value.name }
+    suspend fun setViewMode(value: ViewMode) = edit { it[Keys.VIEW_MODE] = value.name }
+    suspend fun setSearchScope(value: SearchScope) = edit { it[Keys.SEARCH_SCOPE] = value.name }
+    suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
+
+    /** Persists the last read position (verse == 0 means "no focused verse"). */
+    suspend fun setPosition(book: Int, chapter: Int, verse: Int) = edit {
+        it[Keys.LAST_BOOK] = book.coerceIn(1, 66)
+        it[Keys.LAST_CHAPTER] = chapter.coerceAtLeast(1)
+        it[Keys.LAST_VERSE] = verse.coerceAtLeast(0)
+    }
+
+    suspend fun markImported(versionId: String) = edit { it[Keys.imported(versionId)] = true }
+
+    fun isImportedFlow(versionId: String): Flow<Boolean> =
+        context.settingsStore.data.map { it[Keys.imported(versionId)] ?: false }
+
+    suspend fun isImported(versionId: String): Boolean = isImportedFlow(versionId).first()
+
+    private inline fun <reified T : Enum<T>> enumOrDefault(name: String?, default: T): T =
+        name?.let { runCatching { enumValueOf<T>(it) }.getOrNull() } ?: default
+}
