@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.biblia.R
 import com.example.biblia.domain.model.Verse
+import com.example.biblia.domain.model.VerseSpans
 import com.example.biblia.ui.KeepAppLocale
 
 /** The selected verses in every version, one block per version. */
@@ -111,7 +112,7 @@ private fun CompareBlock(row: CompareRow, isCurrent: Boolean) {
             )
         } else {
             Text(
-                text = numberedText(verses, colors.primary),
+                text = numberedText(verses, row.spanEnds, colors.primary),
                 style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Serif),
                 color = colors.onSurface,
             )
@@ -120,13 +121,13 @@ private fun CompareBlock(row: CompareRow, isCurrent: Boolean) {
 }
 
 /** "¹⁶ text ¹⁷ text" with small accent verse numbers (only when several verses). */
-private fun numberedText(verses: List<Verse>, accent: androidx.compose.ui.graphics.Color) =
+private fun numberedText(verses: List<Verse>, ends: Map<Int, Int>, accent: androidx.compose.ui.graphics.Color) =
     buildAnnotatedString {
         verses.forEachIndexed { i, v ->
             if (i > 0) append(' ')
             if (verses.size > 1) {
                 withStyle(SpanStyle(color = accent, fontSize = 11.sp, baselineShift = BaselineShift.Superscript)) {
-                    append(v.verse.toString())
+                    append(VerseSpans.label(v.verse, ends))
                 }
                 append(' ')
             }

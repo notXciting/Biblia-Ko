@@ -104,10 +104,15 @@ class TtsControllerTest {
         advanceUntilIdle()
         finishAndAdvance(1)
         assertEquals(listOf("a", "c"), texts())
-        // Starting ON an empty verse begins at the next one with text.
+        // Verse 2 is merged into verse 1 ("1-2"): starting on 2 reads 1-2.
         tts.play(mbb, 1, 1, 2)
         advanceUntilIdle()
-        assertEquals("c", texts().last())
+        assertEquals("a", texts().last())
+        assertEquals(1 to 2, tts.state.value.verse to tts.state.value.verseEnd)
+        tts.updatePrefs(TtsPrefs(speakVerseNumbers = true))
+        tts.play(mbb, 1, 1, 1)
+        advanceUntilIdle()
+        assertEquals("1-2. a", texts().last())
     }
 
     @Test

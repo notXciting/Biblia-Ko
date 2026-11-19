@@ -33,6 +33,20 @@ class VerseLayoutTest {
         flow.ranges.zipWithNext().forEach { (a, b) -> assertTrue(a.last < b.first) }
     }
 
+    @Test
+    fun combinedVerseShowsRangeInBothLayouts() {
+        for (layout in VerseLayout.entries) {
+            val flow = buildChapterFlow(verses, Color.Blue, 18.sp, layout)
+            val first = flow.annotated.text.substring(flow.ranges[0].first, flow.ranges[0].last + 1)
+            assertTrue("$layout: '$first'", first.startsWith("1-2"))
+            val third = flow.annotated.text.substring(flow.ranges[1].first, flow.ranges[1].last + 1)
+            assertTrue("$layout: '$third'", third.startsWith("3") && !third.startsWith("3-"))
+            // A jump/pulse to the merged number lands on the combined verse.
+            assertEquals(0, flow.indexOfVerse(2))
+            assertEquals(1, flow.indexOfVerse(3))
+        }
+    }
+
     @Test fun paragraphRanges() = check(VerseLayout.PARAGRAPH)
 
     @Test fun verseByVerseRanges() = check(VerseLayout.VERSE_BY_VERSE)

@@ -70,7 +70,10 @@ data class ChapterContent(
     val book: Int,
     val chapter: Int,
     val verses: List<Verse>,
-)
+) {
+    /** Combined verses of this chapter: text verse -> last verse it covers. */
+    val spanEnds: Map<Int, Int> by lazy { VerseSpans.ends(verses) }
+}
 
 /** Copyright/translation metadata stored per version at import time. */
 @Immutable

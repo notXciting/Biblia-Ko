@@ -17,6 +17,7 @@ import com.example.biblia.domain.model.HighlightColor
 import com.example.biblia.domain.reference.ReferenceFormatter
 import com.example.biblia.domain.tts.TtsStatus
 import com.example.biblia.domain.model.VerseReference
+import com.example.biblia.domain.model.VerseSpans
 import com.example.biblia.domain.model.VersionMeta
 import com.example.biblia.perf.VersePerf
 import kotlinx.coroutines.Job
@@ -286,9 +287,16 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         }
     }
 
+    /** Last verse number [verse] covers in the current chapter (combined verses: 1 -> 2). */
+    fun verseEnd(verse: Int): Int = VerseSpans.end(verse, currentContent?.spanEnds.orEmpty())
+
+    /** The selection plus the empty numbers merged into it ({1} -> {1, 2}). */
+    private fun coveredSelection(): Set<Int> =
+        VerseSpans.covered(selectedVerses, currentContent?.spanEnds.orEmpty())
+
     /** "Juan 3:16-18, 20" for the current selection (panel header, share text). */
     fun selectionLabel(): String =
-        ReferenceFormatter.format(BookCatalog.book(book).displayName, chapter, selectedVerses)
+        ReferenceFormatter.format(BookCatalog.book(book).displayName, chapter, coveredSelection())
 
     /** Share text in the form: "text" - Juan 3:16-17 (MBB12), or null. */
     fun selectedVersesText(): String? {
@@ -297,23 +305,24 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         val picked = content.verses.filter { it.verse in selectedVerses && !it.isEmpty }
         if (picked.isEmpty()) return null
         val text = picked.joinToString(" ") { it.text }
-        val ref = ReferenceFormatter.format(BookCatalog.book(book).displayName, chapter, picked.map { it.verse })
+        val covered = VerseSpans.covered(picked.map { it.verse }, content.spanEnds)
+        val ref = ReferenceFormatter.format(BookCatalog.book(book).displayName, chapter, covered)
         return "“" + text + "” - " + ref + " (" + version.shortName + ")"
     }
 
     /** Highlights every selected verse, then closes the panel. */
     fun highlightSelection(color: HighlightColor) {
-        actions.highlight(book, chapter, selectedVerses, color)
+        actions.highlight(book, chapter, coveredSelection(), color)
         clearSelection()
     }
 
     fun clearSelectionHighlight() {
-        actions.clearHighlight(book, chapter, selectedVerses)
+        actions.clearHighlight(book, chapter, coveredSelection())
         clearSelection()
     }
 
     fun compareSelection() {
-        actions.openCompare(selectionLabel(), book, chapter, selectedVerses)
+        actions.openCompare(selectionLabel(), book, chapter, coveredSelection())
     }
 
     /** Persists the position debounced so DataStore is not hit on every change. */

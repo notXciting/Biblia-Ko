@@ -44,7 +44,7 @@ internal suspend fun scrollToSpokenVerse(
     topMargin: Float,
     bottomReserve: Float,
 ) {
-    val index = flow.numbers.indexOf(verse)
+    val index = flow.indexOfVerse(verse)
     if (index < 0) return
     val range = flow.ranges[index]
     val top = textTop + l.getLineTop(l.getLineForOffset(range.first))

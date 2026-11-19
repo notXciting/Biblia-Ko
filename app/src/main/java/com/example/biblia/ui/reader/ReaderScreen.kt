@@ -191,7 +191,7 @@ private fun ReaderBody(
         ListenBar(
             visible = listening && vm.selectedVerses.isEmpty(),
             reference = if (tts.verse > 0) {
-                ReferenceFormatter.format(BookCatalog.book(tts.book).displayName, tts.chapter, listOf(tts.verse))
+                ReferenceFormatter.format(BookCatalog.book(tts.book).displayName, tts.chapter, (tts.verse..tts.verseEnd).toList())
             } else "",
             playing = tts.status == TtsStatus.PLAYING,
             onPlayPause = { if (tts.status == TtsStatus.PLAYING) listen.pause() else listen.resume() },
@@ -275,7 +275,10 @@ private fun PageArrow(
 @Composable
 private fun locationLabel(vm: ReaderViewModel): String {
     val name = BookCatalog.book(vm.book).displayName
-    return if (vm.focusedVerse > 0) {
+    val end = vm.verseEnd(vm.focusedVerse)
+    return if (vm.focusedVerse > 0 && end > vm.focusedVerse) {
+        ReferenceFormatter.format(name, vm.chapter, (vm.focusedVerse..end).toList()) // combined "1-2"
+    } else if (vm.focusedVerse > 0) {
         stringResource(R.string.reader_verse_reference, name, vm.chapter, vm.focusedVerse)
     } else {
         stringResource(R.string.reader_chapter_heading, name, vm.chapter)
