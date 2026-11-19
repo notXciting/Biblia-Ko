@@ -2,7 +2,16 @@
 
 Offline Tagalog Bible app: Kotlin + Jetpack Compose + Material 3, Room + FTS4, DataStore, manual DI, Navigation. Source: Tagalog2012Bible.xml (66 books / 1,189 chapters / 30,692 verses / 179 empty). Package com.example.biblia.
 
-## LATEST ROUND: "v2.1.0 (combined verses)" (2026-11-19)
+## LATEST ROUND: "Search: pag-ibig / pag ibig / pagibig" (2026-11-19)
+
+- ROOT CAUSE: SearchQueryBuilder joined terms with " AND ". Android's SQLite uses the FTS STANDARD query syntax (no FTS3_PARENTHESIS), where AND is not an operator, so it was searched as the WORD "and". Every multi-word query in a Tagalog Bible returned 0 results (English verses contain "and", which hid the bug). Reproduced on the real MBB12 text: "pag* AND ibig*" = 0, "pag* ibig*" = 346. Also: `norm_text:"phrase"` returns 0 in that syntax, so phrases carry no column filter.
+- Fix: implicit AND (space). buildPhraseQuery ("pag ibig*", >= 2 words, no digits) runs first, then all-words results (deduped), so real phrase matches lead. SearchIndexText.of = folded text + hyphenated words joined ("pagibig", "magasawa"). SnippetBuilder highlights hyphen-tolerantly ("pagibig" lights up "pag-ibig"). TextNormalizer.fold has an ASCII fast path (same output).
+- Existing installs: SettingsRepository search_index_format (0 = old). AppContainer init -> BibleImporter.upgradeSearchIndex rebuilds FTS rows for imported versions from Room once (per version in one transaction, id order keeps docids canonical, under the import mutex), then sets FORMAT 2.
+- Verified on MBB12 text (Python sqlite, standard syntax): pag-ibig / pag ibig -> 298 phrase + 349 all-words; pagibig -> 301; "Mahal na Diyos" -> 39 (was 0).
+- SearchQueryTest (5). 70 tests pass; release builds. NOT verified on device (re-index time on a phone not measured).
+- Shipped as v2.1.1 (versionCode 5): separate local commit for the USER to push; GitHub release v2.1.1 created as a DRAFT with BibliaKo-v2.1.1.apk (16.9 MB), SHA-256 ed607f6d...55239d01. Publish after the push.
+
+## PREVIOUS ROUND: "v2.1.0 (combined verses)" (2026-11-19)
 
 - versionCode 4 / versionName 2.1.0; README: combined-verse feature line, v2.1.0 badge/APK, 65 tests.
 - Commit made locally for the USER to push manually. GitHub release v2.1.0 created as a DRAFT (target main) with BibliaKo-v2.1.0.apk (16.9 MB), SHA-256 725c40c4...82907d37; publish it after the push (the tag is created on publish).

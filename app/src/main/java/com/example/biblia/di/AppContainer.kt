@@ -2,6 +2,7 @@ package com.example.biblia.di
 
 import android.content.Context
 import com.example.biblia.data.BibleVersion
+import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.db.BibleDatabase
 import com.example.biblia.data.importer.BibleImporter
 import com.example.biblia.data.parser.BibleParser
@@ -70,6 +71,10 @@ class AppContainer(context: Context) {
     )
 
     init {
+        // Re-index installed Bibles once when the search index format changes.
+        applicationScope.launch {
+            runCatching { importer.upgradeSearchIndex(BibleVersionRegistry.all) }
+        }
         mainScope.launch {
             settingsRepository.settings.map { it.tts }.distinctUntilChanged().collect { tts.updatePrefs(it) }
         }

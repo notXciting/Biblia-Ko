@@ -1,4 +1,4 @@
-﻿package com.example.biblia.data.repository
+package com.example.biblia.data.repository
 
 import com.example.biblia.data.db.BibleDao
 import com.example.biblia.domain.model.BookFilter
@@ -50,8 +50,13 @@ class BibleRepository(private val dao: BibleDao) {
         val matchQuery = SearchQueryBuilder.buildMatchQuery(query) ?: return emptyList()
         val books = filter.books
         // A non-contiguous filter (e.g. Prison Letters) needs IN, not BETWEEN.
-        return dao.search(versionId, matchQuery, books == null, books ?: listOf(0), limit)
-            .map { Verse(it.book, it.chapter, it.verse, it.text) }
+        suspend fun run(match: String) =
+            dao.search(versionId, match, books == null, books ?: listOf(0), limit)
+                .map { Verse(it.book, it.chapter, it.verse, it.text) }
+        // Exact phrase first ("pag ibig" -> pag-ibig), then verses with all the words.
+        val phrase = SearchQueryBuilder.buildPhraseQuery(query)?.let { run(it) }.orEmpty()
+        if (phrase.size >= limit) return phrase
+        return (phrase + run(matchQuery)).distinctBy { Triple(it.book, it.chapter, it.verse) }.take(limit)
     }
 
     suspend fun versionMeta(versionId: String): VersionMeta? =

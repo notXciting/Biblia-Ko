@@ -44,6 +44,7 @@ class SettingsRepository(private val context: Context) {
         val TTS_RATE = floatPreferencesKey("tts_rate")
         val TTS_PITCH = floatPreferencesKey("tts_pitch")
         val TTS_NUMBERS = booleanPreferencesKey("tts_speak_numbers")
+        val SEARCH_INDEX_FORMAT = intPreferencesKey("search_index_format")
         fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
@@ -108,6 +109,10 @@ class SettingsRepository(private val context: Context) {
         it[Keys.LAST_CHAPTER] = chapter.coerceAtLeast(1)
         it[Keys.LAST_VERSE] = verse.coerceAtLeast(0)
     }
+
+    /** Format of the FTS rows on disk (0 = before joined compounds were indexed). */
+    suspend fun searchIndexFormat(): Int = context.settingsStore.data.first()[Keys.SEARCH_INDEX_FORMAT] ?: 0
+    suspend fun setSearchIndexFormat(value: Int) = edit { it[Keys.SEARCH_INDEX_FORMAT] = value }
 
     suspend fun markImported(versionId: String) = edit { it[Keys.imported(versionId)] = true }
 

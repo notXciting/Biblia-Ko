@@ -1,4 +1,4 @@
-﻿package com.example.biblia.data.db
+package com.example.biblia.data.db
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -37,6 +37,10 @@ interface BibleDao {
 
     @Query("DELETE FROM verses_fts WHERE verse_id IN (SELECT id FROM verses WHERE versionId = :versionId)")
     fun deleteFtsForVersion(versionId: String)
+
+    /** Verse ids + text in canonical (id) order, for rebuilding the FTS index. */
+    @Query("SELECT id, text FROM verses WHERE versionId = :versionId ORDER BY id")
+    fun verseTexts(versionId: String): List<VerseTextRow>
 
     @Query("DELETE FROM verses WHERE versionId = :versionId")
     fun deleteVersesForVersion(versionId: String)

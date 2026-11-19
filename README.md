@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v2.1.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v2.1.1-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -41,7 +41,7 @@ Biblia Ko works **completely offline**. It needs no account and no internet, and
 
 ### Search & navigation
 - **Type a reference and jump straight to it:** `juan 3:16`, `john 3:16`, `1 cor 13`, `awit 23`. The verse is scrolled into view and briefly highlighted.
-- **Full-text search** across the Bible, accent- and case-insensitive, with matches highlighted in each result.
+- **Full-text search** across the Bible, accent- and case-insensitive, with matches highlighted in each result. Exact phrases are listed first, and hyphenated Tagalog words are found however you type them: *pag-ibig*, *pag ibig* or *pagibig*.
 - **Book filters** grouped by Old Testament, New Testament and themes: Law, Gospels, Paul's Letters, Prophecy, Prison Letters, One-Chapter Books, and more.
 - Browse books → chapters → verses as a **list or a grid**.
 
@@ -66,7 +66,7 @@ Tap any verse to open the verse panel:
 
 ## Download & install
 
-1. Download **`BibliaKo-v2.1.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v2.1.1.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
 3. On first launch the app prepares the default Bible (a few seconds). Every other version is prepared the first time you select it.
 
@@ -122,7 +122,7 @@ sdk.dir=C\:\\path\\to\\Android\\Sdk
 ```bash
 ./gradlew assembleDebug          # debug APK  -> app/build/outputs/apk/debug/
 ./gradlew assembleRelease        # release APK -> app/build/outputs/apk/release/
-./gradlew :app:testDebugUnitTest # unit tests (65)
+./gradlew :app:testDebugUnitTest # unit tests (70)
 ```
 
 On Windows, use `gradlew.bat`. To run a single test class:
