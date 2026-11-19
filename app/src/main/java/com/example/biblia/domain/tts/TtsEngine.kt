@@ -88,6 +88,8 @@ data class TtsState(
     val book: Int = 0,
     val chapter: Int = 0,
     val verse: Int = 0,
+    /** Last verse the spoken verse covers (combined verses, e.g. 1 -> 2). */
+    val verseEnd: Int = verse,
     /** A language with no usable offline voice (drives the help dialog). */
     val voiceProblem: VoiceProblem? = null,
 ) {

@@ -2,6 +2,7 @@ package com.example.biblia.domain.tts
 
 import com.example.biblia.data.BibleVersion
 import com.example.biblia.domain.model.Verse
+import com.example.biblia.domain.model.VerseSpans
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -36,6 +37,7 @@ class TtsController(
     private var book = 0
     private var chapter = 0
     private var verses: List<Verse> = emptyList() // non-empty verses only
+    private var spanEnds: Map<Int, Int> = emptyMap() // combined verses ("1-2")
     private var index = 0
     private var utterance = 0
     private var currentId: String? = null
@@ -204,12 +206,13 @@ class TtsController(
         val id = "verse-" + ++utterance
         currentId = id
         publish(TtsStatus.PLAYING)
-        val text = if (prefs.speakVerseNumbers) "${verse.verse}. ${verse.text}" else verse.text
+        val text = if (prefs.speakVerseNumbers) VerseSpans.label(verse.verse, spanEnds) + ". " + verse.text else verse.text
         e.speak(text, id, locale, pickVoice(offline, v.language), prefs.rate, prefs.pitch)
     }
 
     private fun publish(status: TtsStatus) {
-        _state.value = TtsState(status, version?.id.orEmpty(), book, chapter, verses.getOrNull(index)?.verse ?: 0)
+        val verse = verses.getOrNull(index)?.verse ?: 0
+        _state.value = TtsState(status, version?.id.orEmpty(), book, chapter, verse, VerseSpans.end(verse, spanEnds))
     }
 
     /**
@@ -221,12 +224,14 @@ class TtsController(
         var pos: Pair<Int, Int>? = b to c
         repeat(MAX_EMPTY_CHAPTERS) {
             val (pb, pc) = pos ?: return false
-            val list = runCatching { source.verses(versionId, pb, pc) }.getOrDefault(emptyList())
-                .filter { !it.isEmpty }
+            val raw = runCatching { source.verses(versionId, pb, pc) }.getOrDefault(emptyList())
+            val list = raw.filter { !it.isEmpty }
             if (list.isNotEmpty()) {
-                book = pb; chapter = pc; verses = list
+                val ends = VerseSpans.ends(raw)
+                book = pb; chapter = pc; verses = list; spanEnds = ends
+                // Starting on a merged number (2 of "1-2") starts at its combined verse.
                 index = if (atEnd) list.lastIndex
-                else list.indexOfFirst { it.verse >= verse }.takeIf { it >= 0 } ?: list.lastIndex
+                else list.indexOfFirst { VerseSpans.end(it.verse, ends) >= verse }.takeIf { it >= 0 } ?: list.lastIndex
                 return true
             }
             pos = if (atEnd) ChapterSteps.previous(pb, pc) else ChapterSteps.next(pb, pc)

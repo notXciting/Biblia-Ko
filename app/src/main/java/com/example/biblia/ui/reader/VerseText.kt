@@ -43,28 +43,39 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.biblia.domain.model.Verse
 import com.example.biblia.domain.model.VerseLayout
+import com.example.biblia.domain.model.VerseSpans
 import com.example.biblia.perf.VersePerf
 
 internal class ChapterFlow(
     val annotated: AnnotatedString,
     val ranges: List<IntRange>,
     val numbers: List<Int>,
-)
+    /** Combined verses ("1-2"): text verse -> last verse it covers. */
+    val ends: Map<Int, Int> = emptyMap(),
+) {
+    /** Index of the verse that shows [verse]; a merged number maps to its combined verse. */
+    fun indexOfVerse(verse: Int): Int {
+        val i = numbers.indexOf(verse)
+        return if (i >= 0) i else numbers.indexOf(VerseSpans.ownerOf(verse, ends))
+    }
+}
 
 internal fun buildChapterFlow(
     verses: List<Verse>,
     accent: Color,
     fontSize: TextUnit,
     layout: VerseLayout,
-): ChapterFlow =
-    if (layout == VerseLayout.VERSE_BY_VERSE) buildVerseByVerse(verses, accent, fontSize)
-    else buildParagraph(verses, accent, fontSize)
+): ChapterFlow {
+    val ends = VerseSpans.ends(verses)
+    return if (layout == VerseLayout.VERSE_BY_VERSE) buildVerseByVerse(verses, accent, fontSize, ends)
+    else buildParagraph(verses, accent, fontSize, ends)
+}
 
 private const val EN_SPACE = ' '
 private const val ZERO_WIDTH_SPACE = '​'
 
 /** One flowing paragraph: superscript numbers inline. */
-private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUnit): ChapterFlow {
+private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUnit, ends: Map<Int, Int>): ChapterFlow {
     val builder = AnnotatedString.Builder()
     val ranges = ArrayList<IntRange>()
     val numbers = ArrayList<Int>()
@@ -79,14 +90,14 @@ private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUni
                 fontWeight = FontWeight.SemiBold,
                 baselineShift = BaselineShift.Superscript,
             )
-        ) { append(verse.verse.toString()) }
+        ) { append(VerseSpans.label(verse.verse, ends)) }
         builder.append(' ')
         builder.append(verse.text)
         ranges.add(start until builder.length)
         numbers.add(verse.verse)
         builder.append(' ')
     }
-    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers)
+    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers, ends)
 }
 
 /**
@@ -95,7 +106,7 @@ private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUni
  * so it is a real gap rather than a full blank line. Verse ranges never cover
  * the gaps, so tapping, highlights and the pulse work exactly as in PARAGRAPH.
  */
-private fun buildVerseByVerse(verses: List<Verse>, accent: Color, fontSize: TextUnit): ChapterFlow {
+private fun buildVerseByVerse(verses: List<Verse>, accent: Color, fontSize: TextUnit, ends: Map<Int, Int>): ChapterFlow {
     val builder = AnnotatedString.Builder()
     val ranges = ArrayList<IntRange>()
     val numbers = ArrayList<Int>()
@@ -110,7 +121,7 @@ private fun buildVerseByVerse(verses: List<Verse>, accent: Color, fontSize: Text
     visible.forEachIndexed { i, verse ->
         builder.withStyle(ParagraphStyle()) {
             val start = length
-            withStyle(numberStyle) { append(verse.verse.toString()) }
+            withStyle(numberStyle) { append(VerseSpans.label(verse.verse, ends)) }
             append(EN_SPACE) // between number and text
             append(verse.text)
             ranges.add(start until length)
@@ -120,7 +131,7 @@ private fun buildVerseByVerse(verses: List<Verse>, accent: Color, fontSize: Text
             builder.withStyle(gap) { withStyle(gapText) { append(ZERO_WIDTH_SPACE) } }
         }
     }
-    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers)
+    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers, ends)
 }
 
 /**
@@ -184,7 +195,7 @@ fun ChapterFlowText(
         val l = layout ?: return@LaunchedEffect
         val state = scrollState ?: return@LaunchedEffect
         if (scrollTarget <= 0 || scrolledFor == scrollTarget) return@LaunchedEffect
-        val index = flow.numbers.indexOf(scrollTarget)
+        val index = flow.indexOfVerse(scrollTarget)
         if (index >= 0) {
             val line = l.getLineForOffset(flow.ranges[index].first)
             val target = (textTop + l.getLineTop(line) - margin).coerceAtLeast(0f)
@@ -236,11 +247,11 @@ fun ChapterFlowText(
             .graphicsLayer { alpha = if (positioned) 1f else 0f }
             .drawBehind {
                 val l = layout ?: return@drawBehind
-                val spoken = flow.numbers.indexOf(speakingVerse)
+                val spoken = flow.indexOfVerse(speakingVerse)
                 if (speakingVerse > 0 && spoken >= 0) drawVerseBoxes(l, flow.ranges[spoken], speakingColor)
                 val alpha = pulse.value
                 if (alpha <= 0f || pulseVerse <= 0) return@drawBehind
-                val index = flow.numbers.indexOf(pulseVerse)
+                val index = flow.indexOfVerse(pulseVerse)
                 if (index < 0) return@drawBehind
                 drawVerseBoxes(l, flow.ranges[index], accent.copy(alpha = alpha))
             }
@@ -289,7 +300,10 @@ private fun buildStyled(
         val n = flow.numbers[i]
         val from = flow.ranges[i].first
         val to = flow.ranges[i].last + 1
-        highlights[n]?.let { builder.addStyle(SpanStyle(background = it), from, to) }
+        // A combined verse ("1-2") shows a highlight made on any of its numbers
+        // (e.g. on verse 2 in a version that has it separately).
+        val color = highlights[n] ?: (n + 1..VerseSpans.end(n, flow.ends)).firstNotNullOfOrNull { highlights[it] }
+        color?.let { builder.addStyle(SpanStyle(background = it), from, to) }
         if (n in selected) {
             builder.addStyle(
                 SpanStyle(background = selectionColor, textDecoration = TextDecoration.Underline),

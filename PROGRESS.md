@@ -2,7 +2,22 @@
 
 Offline Tagalog Bible app: Kotlin + Jetpack Compose + Material 3, Room + FTS4, DataStore, manual DI, Navigation. Source: Tagalog2012Bible.xml (66 books / 1,189 chapters / 30,692 verses / 179 empty). Package com.example.biblia.
 
-## LATEST ROUND: "v2.0.0 release" (2026-11-18)
+## LATEST ROUND: "v2.1.0 (combined verses)" (2026-11-19)
+
+- versionCode 4 / versionName 2.1.0; README: combined-verse feature line, v2.1.0 badge/APK, 65 tests.
+- Commit made locally for the USER to push manually. GitHub release v2.1.0 created as a DRAFT (target main) with BibliaKo-v2.1.0.apk (16.9 MB), SHA-256 725c40c4...82907d37; publish it after the push (the tag is created on publish).
+
+## PREVIOUS ROUND: "Combined verses show as 1-2" (2026-11-19)
+
+- Data check: ONLY the Tagalog files have empty verses (MBB12 179, ASD 608; all 8 English = 0). Every empty verse is a number merged into the previous text verse (Ruth 1:1 = 1-2; also at chapter end, e.g. Ruth 4:18-22). Verses a translation omits (Mat 17:21, 18:11, Mark 9:44/46, Acts 8:37, John 5:4) carry [bracketed] text, NOT empty, so they are not misread as spans.
+- domain/model/VerseSpans (pure): ends() text verse -> last covered verse; label() "1-2"; ownerOf() merged number -> its combined verse; covered() expands a selection. ChapterContent.spanEnds (lazy).
+- Reader: both layouts print "1-2" (ChapterFlow.ends); ChapterFlow.indexOfVerse maps a jump/pulse/anchor/spoken verse on a merged number (e.g. Ruth 1:2) to the combined verse. Highlight made on any covered number shows on the combined verse.
+- Selection: panel label, copy/share reference, highlight/remove and Compare use the covered set ("Ruth 1:1-2"; highlighting 1-2 stores 1 AND 2, so KJV shows both). Top-bar location shows "Ruth 1:1-2". Compare rows label combined verses and include them when any covered number is selected.
+- Listen: TtsState.verseEnd; ListenBar shows "1-2"; "read verse numbers" says "1-2."; starting on a merged number starts at its combined verse.
+- NOT changed: search result references and the verse-number grid in the selection screen still list single numbers (tapping 2 lands on 1-2).
+- Tests: VerseSpansTest (4), VerseLayoutTest +1, TtsControllerTest updated. 65 pass; release builds. NOT verified on device.
+
+## PREVIOUS ROUND: "v2.0.0 release" (2026-11-18)
 
 - v1.2.0 was pushed by the user manually. versionCode 3 / versionName 2.0.0. README: Listen section (offline read-aloud), requirements note, tech stack, how it works, 60 tests.
 - Release v2.0.0: BibliaKo-v2.0.0.apk (16.9 MB, debug-key signed), SHA-256 3501CEEA...908DF534. 60 tests pass.

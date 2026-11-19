@@ -8,13 +8,19 @@ import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.HighlightColor
 import com.example.biblia.domain.model.Verse
+import com.example.biblia.domain.model.VerseSpans
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /** One version's text for the compare sheet; [verses] null = not installed. */
-data class CompareRow(val version: BibleVersion, val verses: List<Verse>?)
+data class CompareRow(
+    val version: BibleVersion,
+    val verses: List<Verse>?,
+    /** Combined verses in this version's chapter (verse labels like "1-2"). */
+    val spanEnds: Map<Int, Int> = emptyMap(),
+)
 
 /** Compare sheet state: the reference plus one row per registered version. */
 data class CompareState(val reference: String, val rows: List<CompareRow>)
@@ -47,13 +53,17 @@ class VerseActions(private val container: AppContainer, private val scope: Corou
         compareJob?.cancel()
         compareJob = scope.launch {
             val rows = BibleVersionRegistry.all.map { version ->
-                val text = if (container.settingsRepository.isImported(version.id)) {
-                    runCatching { container.bibleRepository.getChapter(version.id, book, chapter) }
-                        .getOrNull()?.verses?.filter { it.verse in verses && !it.isEmpty }
+                val content = if (container.settingsRepository.isImported(version.id)) {
+                    runCatching { container.bibleRepository.getChapter(version.id, book, chapter) }.getOrNull()
                 } else {
                     null
                 }
-                CompareRow(version, text)
+                val ends = content?.spanEnds.orEmpty()
+                // A combined verse is included when ANY number it covers is selected.
+                val text = content?.verses?.filter { v ->
+                    !v.isEmpty && (v.verse..VerseSpans.end(v.verse, ends)).any { it in verses }
+                }
+                CompareRow(version, if (content == null) null else text, ends)
             }
             compare = CompareState(reference, rows)
         }
