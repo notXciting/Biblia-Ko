@@ -49,3 +49,9 @@ data class BookChapterCountRow(
     val book: Int,
     val maxChapter: Int,
 )
+
+/** Projection row for rebuilding the search index. */
+data class VerseTextRow(
+    val id: Long,
+    val text: String,
+)

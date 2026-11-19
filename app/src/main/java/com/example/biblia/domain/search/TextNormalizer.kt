@@ -19,6 +19,7 @@ object TextNormalizer {
         if (text.isEmpty()) return text
         val sb = StringBuilder(text.length)
         for (c in text) {
+            if (c.code < 128) { sb.append(c.lowercaseChar()); continue } // no accents to strip
             val lower = c.lowercaseChar()
             val decomposed = Normalizer.normalize(lower.toString(), Normalizer.Form.NFD)
             sb.append(if (decomposed.isEmpty()) lower else decomposed[0])

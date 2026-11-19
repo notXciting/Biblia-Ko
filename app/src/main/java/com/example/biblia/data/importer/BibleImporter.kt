@@ -11,7 +11,7 @@ import com.example.biblia.data.parser.BibleMetadata
 import com.example.biblia.data.parser.BibleParser
 import com.example.biblia.data.parser.BibleParserListener
 import com.example.biblia.data.repository.SettingsRepository
-import com.example.biblia.domain.search.TextNormalizer
+import com.example.biblia.domain.search.SearchIndexText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -73,6 +74,32 @@ class BibleImporter(
         }
     }
 
+    /**
+     * One-time re-index after [SearchIndexText.FORMAT] changes (e.g. joined
+     * compounds for "pagibig"). Rebuilds the FTS rows of every installed
+     * version from the verses already in Room; no re-import, highlights and
+     * position untouched. Each version is swapped in one transaction, so a
+     * search meanwhile still sees the old index.
+     */
+    suspend fun upgradeSearchIndex(versions: List<BibleVersion>) = withContext(Dispatchers.IO) {
+        if (settings.searchIndexFormat() >= SearchIndexText.FORMAT) return@withContext
+        mutex.withLock {
+            val dao = database.bibleDao()
+            for (version in versions) {
+                if (!settings.isImported(version.id)) continue
+                val rows = dao.verseTexts(version.id)
+                database.runInTransaction {
+                    dao.deleteFtsForVersion(version.id)
+                    // Inserted in id order: docids stay canonical (search ORDER BY docid).
+                    rows.chunked(BATCH_SIZE).forEach { chunk ->
+                        dao.insertVerseFts(chunk.map { VerseFtsEntity(it.id, SearchIndexText.of(it.text)) })
+                    }
+                }
+            }
+            settings.setSearchIndexFormat(SearchIndexText.FORMAT)
+        }
+    }
+
     private suspend fun doImport(version: BibleVersion) {
         val dao = database.bibleDao()
         setState(version.id, ImportState.Phase.RUNNING, 0f)
@@ -93,7 +120,7 @@ class BibleImporter(
                 val ftsRows = ArrayList<VerseFtsEntity>(ids.size)
                 for (i in ids.indices) {
                     val verse = pendingVerses[i]
-                    ftsRows.add(VerseFtsEntity(verseId = ids[i], normText = TextNormalizer.fold(verse.text.lowercase())))
+                    ftsRows.add(VerseFtsEntity(verseId = ids[i], normText = SearchIndexText.of(verse.text)))
                 }
                 dao.insertVerseFts(ftsRows)
             }

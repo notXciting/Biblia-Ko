@@ -18,16 +18,10 @@ object SnippetBuilder {
 
         val folded = TextNormalizer.fold(text.lowercase())
 
-        // Collect every occurrence of every token.
+        // Collect every occurrence of every token; "pagibig" also finds "pag-ibig".
         val occurrences = ArrayList<IntRange>()
         for (token in tokens) {
-            var from = 0
-            while (true) {
-                val index = folded.indexOf(token, from)
-                if (index < 0) break
-                occurrences.add(index until (index + token.length))
-                from = index + token.length
-            }
+            SearchIndexText.hyphenTolerant(token).findAll(folded).forEach { occurrences.add(it.range) }
         }
         if (occurrences.isEmpty()) return VerseSnippet(text.take(maxLength), emptyList())
 
