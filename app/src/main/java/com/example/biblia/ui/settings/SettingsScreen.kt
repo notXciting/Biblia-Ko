@@ -87,6 +87,8 @@ fun SettingsScreen(
                     vm.setAppLanguage(value)
                 },
             )
+            Spacer(Modifier.height(8.dp))
+            UiScaleSection(current = settings.uiScale, onChange = { vm.setUiScale(it) })
             Spacer(Modifier.height(16.dp))
             AppIconSection(
                 current = settings.appIcon,

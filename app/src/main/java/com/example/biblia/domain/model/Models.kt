@@ -222,4 +222,19 @@ data class AppSettings(
     val chapter: Int = 1,
     val verse: Int = 0,
     val tts: com.example.biblia.domain.tts.TtsPrefs = com.example.biblia.domain.tts.TtsPrefs(),
+    /** Whole-app UI size multiplier (Settings > "Laki ng app"); 1 = phone default. */
+    val uiScale: Float = 1f,
 )
+
+/** Range and step of the app UI size setting. */
+object UiScale {
+    const val MIN = 0.8f
+    const val MAX = 1.3f
+    const val STEP = 0.05f
+    const val DEFAULT = 1f
+
+    /** Clamps and snaps to the 5% grid (so 1.0 stays exactly 1.0). */
+    fun clamp(value: Float): Float = (Math.round(value.coerceIn(MIN, MAX) / STEP) * STEP).let {
+        Math.round(it * 100f) / 100f
+    }
+}

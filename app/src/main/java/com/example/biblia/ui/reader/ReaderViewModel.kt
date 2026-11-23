@@ -321,6 +321,31 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         clearSelection()
     }
 
+    /** "Tala": note on the selected verses (combined verses included), then closes the panel. */
+    fun noteSelection() {
+        val verses = coveredSelection()
+        if (verses.isEmpty()) return
+        actions.openNote(selectionLabel(), book, chapter, verses, quoteOf(verses))
+        clearSelection()
+    }
+
+    /** Note marker tapped in the reader. */
+    fun openNote(id: Long) {
+        actions.openNoteById(
+            id,
+            reference = { ReferenceFormatter.format(BookCatalog.book(it.book).displayName, it.chapter, it.verses) },
+            quote = { quoteOf(it.verses) },
+        )
+    }
+
+    /** Text of the verses (from the current chapter) shown above a note. */
+    private fun quoteOf(verses: Set<Int>): String {
+        val content = currentContent ?: return ""
+        return content.verses
+            .filter { v -> !v.isEmpty && (v.verse..VerseSpans.end(v.verse, content.spanEnds)).any { it in verses } }
+            .joinToString(" ") { it.text }
+    }
+
     fun compareSelection() {
         actions.openCompare(selectionLabel(), book, chapter, coveredSelection())
     }

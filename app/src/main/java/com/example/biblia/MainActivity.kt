@@ -48,7 +48,7 @@ class MainActivity : ComponentActivity() {
                 enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
                 onDispose {}
             }
-            LocalizedContent(localeTag = uiLocaleTag(settings)) {
+            LocalizedContent(localeTag = uiLocaleTag(settings), uiScale = settings.uiScale) {
                 BibleTheme(settings = settings) {
                     AppRoot(container = container)
                 }

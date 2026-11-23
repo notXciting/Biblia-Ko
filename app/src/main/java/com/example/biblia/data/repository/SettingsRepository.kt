@@ -15,6 +15,7 @@ import com.example.biblia.domain.model.AppSettings
 import com.example.biblia.domain.model.LineSpacing
 import com.example.biblia.domain.model.SearchScope
 import com.example.biblia.domain.model.ThemeMode
+import com.example.biblia.domain.model.UiScale
 import com.example.biblia.domain.model.VerseLayout
 import com.example.biblia.domain.model.ViewMode
 import com.example.biblia.domain.tts.TtsPrefs
@@ -45,6 +46,7 @@ class SettingsRepository(private val context: Context) {
         val TTS_PITCH = floatPreferencesKey("tts_pitch")
         val TTS_NUMBERS = booleanPreferencesKey("tts_speak_numbers")
         val SEARCH_INDEX_FORMAT = intPreferencesKey("search_index_format")
+        val UI_SCALE = floatPreferencesKey("ui_scale")
         fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
@@ -65,6 +67,7 @@ class SettingsRepository(private val context: Context) {
             book = (p[Keys.LAST_BOOK] ?: 1).coerceIn(1, 66),
             chapter = (p[Keys.LAST_CHAPTER] ?: 1).coerceAtLeast(1),
             verse = (p[Keys.LAST_VERSE] ?: 0).coerceAtLeast(0),
+            uiScale = UiScale.clamp(p[Keys.UI_SCALE] ?: UiScale.DEFAULT),
             tts = TtsPrefs(
                 rate = (p[Keys.TTS_RATE] ?: 1f).coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = (p[Keys.TTS_PITCH] ?: 1f).coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),
@@ -92,6 +95,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSearchScope(value: SearchScope) = edit { it[Keys.SEARCH_SCOPE] = value.name }
     suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
 
+    suspend fun setUiScale(value: Float) = edit { it[Keys.UI_SCALE] = UiScale.clamp(value) }
     suspend fun setTtsRate(value: Float) =
         edit { it[Keys.TTS_RATE] = value.coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE) }
     suspend fun setTtsPitch(value: Float) =

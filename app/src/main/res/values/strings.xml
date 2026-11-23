@@ -178,4 +178,13 @@
     <string name="voice_open_tts_settings">Buksan ang Text-to-speech settings</string>
     <string name="voice_open_play_store">Buksan ang Play Store</string>
     <string name="listen_voice_default">Awtomatiko (pinakamahusay na offline)</string>
+    <string name="verse_action_note">Tala</string>
+    <string name="note_new_title">Bagong tala</string>
+    <string name="note_edit_title">Iyong tala</string>
+    <string name="note_hint">Isulat ang iyong tala, panalangin o pagninilay…</string>
+    <string name="note_save">I-save</string>
+    <string name="note_delete">Burahin</string>
+    <string name="settings_ui_scale">Laki ng app</string>
+    <string name="settings_ui_scale_hint">Palakihin o paliitin ang buong app: mga button, menu at teksto. Hiwalay ito sa display size ng telepono.</string>
+    <string name="settings_ui_scale_reset">Ibalik sa 100%</string>
 </resources>

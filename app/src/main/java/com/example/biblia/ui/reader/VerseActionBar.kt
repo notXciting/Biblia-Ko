@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.FormatColorReset
 import androidx.compose.material.icons.outlined.Share
@@ -55,7 +56,7 @@ import com.example.biblia.domain.model.HighlightColor
 
 /**
  * Verse selection panel: reference header, highlighter colors, and actions
- * (copy, share, compare across versions). Slides up from the bottom.
+ * (copy, share, compare across versions, note). Slides up from the bottom.
  * [activeColor] = the color every selected verse already has (checkmark);
  * [anyHighlighted] shows the "remove highlight" button.
  */
@@ -70,6 +71,7 @@ fun VerseActionBar(
     onCopy: () -> Unit,
     onShare: () -> Unit,
     onCompare: () -> Unit,
+    onNote: () -> Unit,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -119,9 +121,11 @@ fun VerseActionBar(
                         .fillMaxWidth()
                         .padding(end = 12.dp),
                 ) {
-                    ActionItem(Icons.Outlined.ContentCopy, stringResource(R.string.action_copy), onCopy)
-                    ActionItem(Icons.Outlined.Share, stringResource(R.string.action_share), onShare)
-                    ActionItem(Icons.Outlined.Translate, stringResource(R.string.verse_action_compare), onCompare)
+                    val item = Modifier.weight(1f)
+                    ActionItem(Icons.Outlined.ContentCopy, stringResource(R.string.action_copy), onCopy, item)
+                    ActionItem(Icons.Outlined.Share, stringResource(R.string.action_share), onShare, item)
+                    ActionItem(Icons.Outlined.Translate, stringResource(R.string.verse_action_compare), onCompare, item)
+                    ActionItem(Icons.Outlined.EditNote, stringResource(R.string.verse_action_note), onNote, item)
                 }
             }
         }
@@ -181,13 +185,13 @@ private fun Swatch(color: HighlightColor, selected: Boolean, onClick: () -> Unit
 }
 
 @Composable
-private fun ActionItem(icon: ImageVector, label: String, onClick: () -> Unit) {
+private fun ActionItem(icon: ImageVector, label: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 14.dp, vertical = 6.dp),
+            .padding(horizontal = 4.dp, vertical = 6.dp),
     ) {
         Box(
             contentAlignment = Alignment.Center,
@@ -199,6 +203,12 @@ private fun ActionItem(icon: ImageVector, label: String, onClick: () -> Unit) {
             Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(22.dp))
         }
         Spacer(Modifier.height(6.dp))
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }

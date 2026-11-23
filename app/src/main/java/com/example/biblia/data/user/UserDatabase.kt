@@ -36,17 +36,23 @@ interface HighlightDao {
 }
 
 /**
- * The user's OWN data (highlights). Deliberately separate from the Bible
- * content database, which may be wiped and re-imported: this one must never
- * use fallbackToDestructiveMigration — any schema change needs a Migration.
+ * The user's OWN data (highlights, notes). Deliberately separate from the
+ * Bible content database, which may be wiped and re-imported: this one must
+ * never use fallbackToDestructiveMigration — any schema change needs a
+ * Migration. Schemas are exported to app/schemas to check migrations against.
+ *
+ * v1: highlights. v2: + notes ([USER_DB_MIGRATION_1_2]).
  */
-@Database(entities = [HighlightEntity::class], version = 1, exportSchema = false)
+@Database(entities = [HighlightEntity::class, NoteEntity::class], version = 2, exportSchema = true)
 abstract class UserDatabase : RoomDatabase() {
 
     abstract fun highlightDao(): HighlightDao
+    abstract fun noteDao(): NoteDao
 
     companion object {
         fun build(context: Context): UserDatabase =
-            Room.databaseBuilder(context.applicationContext, UserDatabase::class.java, "user.db").build()
+            Room.databaseBuilder(context.applicationContext, UserDatabase::class.java, "user.db")
+                .addMigrations(USER_DB_MIGRATION_1_2)
+                .build()
     }
 }

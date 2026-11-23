@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.biblia.R
 import com.example.biblia.data.catalog.BookCatalog
 import com.example.biblia.domain.model.ChapterContent
+import com.example.biblia.domain.model.NoteVerses
 import com.example.biblia.domain.model.VerseLayout
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
@@ -83,6 +84,10 @@ fun ChapterPage(
     // Highlights for this chapter (user DB, version-independent), live.
     val highlightFlow = remember(book, chapter) { vm.actions.highlights(book, chapter) }
     val highlights by highlightFlow.collectAsState(initial = emptyMap())
+    // Personal notes: an icon after the last verse of each note (user DB, live).
+    val noteFlow = remember(book, chapter) { vm.actions.notes(book, chapter) }
+    val notes by noteFlow.collectAsState(initial = emptyList())
+    val noteMarkers = remember(notes, content) { NoteVerses.markers(notes, content?.spanEnds.orEmpty()) }
     val darkSurface = MaterialTheme.colorScheme.background.luminance() < 0.4f
     val highlightColors = remember(highlights, darkSurface) {
         // 0.30 in dark themes keeps light verse text >= 5.6:1 on every highlight
@@ -136,6 +141,8 @@ fun ChapterPage(
                 onAnchorConsumed = { vm.consumeAnchor() },
                 onTopVerse = if (isCurrentPage) vm::onTopVerse else null,
                 speakingVerse = speakingVerse,
+                notedVerses = noteMarkers.keys,
+                onNoteTap = { verse -> noteMarkers[verse]?.firstOrNull()?.let { vm.openNote(it) } },
                 onVerseTap = { number ->
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     if (isCurrentPage) vm.tapVerse(number)

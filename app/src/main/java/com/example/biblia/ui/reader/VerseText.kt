@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.example.biblia.domain.model.Verse
 import com.example.biblia.domain.model.VerseLayout
 import com.example.biblia.domain.model.VerseSpans
+import androidx.compose.foundation.text.appendInlineContent
 import com.example.biblia.perf.VersePerf
 
 internal class ChapterFlow(
@@ -52,6 +53,8 @@ internal class ChapterFlow(
     val numbers: List<Int>,
     /** Combined verses ("1-2"): text verse -> last verse it covers. */
     val ends: Map<Int, Int> = emptyMap(),
+    /** Note icons after verses: icon text range -> verse number. */
+    val markers: List<Pair<IntRange, Int>> = emptyList(),
 ) {
     /** Index of the verse that shows [verse]; a merged number maps to its combined verse. */
     fun indexOfVerse(verse: Int): Int {
@@ -65,18 +68,36 @@ internal fun buildChapterFlow(
     accent: Color,
     fontSize: TextUnit,
     layout: VerseLayout,
+    noted: Set<Int> = emptySet(),
 ): ChapterFlow {
     val ends = VerseSpans.ends(verses)
-    return if (layout == VerseLayout.VERSE_BY_VERSE) buildVerseByVerse(verses, accent, fontSize, ends)
-    else buildParagraph(verses, accent, fontSize, ends)
+    return if (layout == VerseLayout.VERSE_BY_VERSE) buildVerseByVerse(verses, accent, fontSize, ends, noted)
+    else buildParagraph(verses, accent, fontSize, ends, noted)
+}
+
+internal const val NOTE_MARKER_ID = "note"
+
+/** Inline note icon after a verse (outside the verse's own range). */
+private fun AnnotatedString.Builder.appendNoteMarker(verse: Int, markers: MutableList<Pair<IntRange, Int>>) {
+    append(' ')
+    val start = length
+    appendInlineContent(NOTE_MARKER_ID, "✎")
+    markers.add((start until length) to verse)
 }
 
 private const val EN_SPACE = ' '
 private const val ZERO_WIDTH_SPACE = '​'
 
 /** One flowing paragraph: superscript numbers inline. */
-private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUnit, ends: Map<Int, Int>): ChapterFlow {
+private fun buildParagraph(
+    verses: List<Verse>,
+    accent: Color,
+    fontSize: TextUnit,
+    ends: Map<Int, Int>,
+    noted: Set<Int>,
+): ChapterFlow {
     val builder = AnnotatedString.Builder()
+    val markers = ArrayList<Pair<IntRange, Int>>()
     val ranges = ArrayList<IntRange>()
     val numbers = ArrayList<Int>()
     val numberSize = (fontSize.value * 0.62f).sp
@@ -95,9 +116,10 @@ private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUni
         builder.append(verse.text)
         ranges.add(start until builder.length)
         numbers.add(verse.verse)
+        if (verse.verse in noted) builder.appendNoteMarker(verse.verse, markers)
         builder.append(' ')
     }
-    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers, ends)
+    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers, ends, markers)
 }
 
 /**
@@ -106,8 +128,15 @@ private fun buildParagraph(verses: List<Verse>, accent: Color, fontSize: TextUni
  * so it is a real gap rather than a full blank line. Verse ranges never cover
  * the gaps, so tapping, highlights and the pulse work exactly as in PARAGRAPH.
  */
-private fun buildVerseByVerse(verses: List<Verse>, accent: Color, fontSize: TextUnit, ends: Map<Int, Int>): ChapterFlow {
+private fun buildVerseByVerse(
+    verses: List<Verse>,
+    accent: Color,
+    fontSize: TextUnit,
+    ends: Map<Int, Int>,
+    noted: Set<Int>,
+): ChapterFlow {
     val builder = AnnotatedString.Builder()
+    val markers = ArrayList<Pair<IntRange, Int>>()
     val ranges = ArrayList<IntRange>()
     val numbers = ArrayList<Int>()
     val numberStyle = SpanStyle(
@@ -126,12 +155,13 @@ private fun buildVerseByVerse(verses: List<Verse>, accent: Color, fontSize: Text
             append(verse.text)
             ranges.add(start until length)
             numbers.add(verse.verse)
+            if (verse.verse in noted) appendNoteMarker(verse.verse, markers)
         }
         if (i < visible.lastIndex) {
             builder.withStyle(gap) { withStyle(gapText) { append(ZERO_WIDTH_SPACE) } }
         }
     }
-    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers, ends)
+    return ChapterFlow(builder.toAnnotatedString(), ranges, numbers, ends, markers)
 }
 
 /**
@@ -158,12 +188,16 @@ fun ChapterFlowText(
     onAnchorConsumed: () -> Unit = {},
     onTopVerse: ((Int) -> Unit)? = null,
     speakingVerse: Int = 0,
+    notedVerses: Set<Int> = emptySet(),
+    onNoteTap: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     // Scroll target: a highlighted jump verse, else a silent anchor (version switch).
     val scrollTarget = if (pulseVerse > 0) pulseVerse else anchorVerse
     val reportTop by rememberUpdatedState(onTopVerse)
-    val flow = remember(verses, accent, fontSize, layout) { buildChapterFlow(verses, accent, fontSize, layout) }
+    val flow = remember(verses, accent, fontSize, layout, notedVerses) {
+        buildChapterFlow(verses, accent, fontSize, layout, notedVerses)
+    }
     val pulse = remember { Animatable(0f) }
     LaunchedEffect(pulseVerse) {
         if (pulseVerse > 0) {
@@ -241,6 +275,7 @@ fun ChapterFlowText(
             color = MaterialTheme.colorScheme.onBackground,
         ),
         onTextLayout = { layout = it },
+        inlineContent = noteInlineContent(accent),
         modifier = modifier
             .fillMaxWidth()
             .onPlaced { textTop = it.positionInParent().y }
@@ -259,6 +294,7 @@ fun ChapterFlowText(
                 detectTapGestures { position ->
                     val l = layout ?: return@detectTapGestures
                     val offset = l.getOffsetForPosition(position)
+                    flow.markers.firstOrNull { offset in it.first }?.let { onNoteTap(it.second); return@detectTapGestures }
                     val index = flow.ranges.indexOfFirst { offset in it }
                     if (index >= 0) onVerseTap(flow.numbers[index])
                 }

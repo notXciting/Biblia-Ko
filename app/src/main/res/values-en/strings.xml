@@ -177,4 +177,13 @@
     <string name="voice_open_tts_settings">Open text-to-speech settings</string>
     <string name="voice_open_play_store">Open Play Store</string>
     <string name="listen_voice_default">Automatic (best offline)</string>
+    <string name="verse_action_note">Note</string>
+    <string name="note_new_title">New note</string>
+    <string name="note_edit_title">Your note</string>
+    <string name="note_hint">Write your note, prayer or reflection…</string>
+    <string name="note_save">Save</string>
+    <string name="note_delete">Delete</string>
+    <string name="settings_ui_scale">App size</string>
+    <string name="settings_ui_scale_hint">Make the whole app bigger or smaller: buttons, menus and text. Independent of the phone display size.</string>
+    <string name="settings_ui_scale_reset">Reset to 100%</string>
 </resources>

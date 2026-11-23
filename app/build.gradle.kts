@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.biblia"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "2.1.1"
+        versionCode = 6
+        versionName = "2.2.0"
     }
 
     testOptions {
@@ -59,6 +59,12 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+// Room schema JSON (only UserDatabase exports it): migrations of the user's
+// own data (user.db) are checked against these files.
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 dependencies {

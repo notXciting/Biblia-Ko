@@ -102,6 +102,14 @@ fun ReaderScreen(
     vm.actions.compare?.let { state ->
         CompareSheet(state = state, currentVersionId = vm.version.id, onDismiss = { vm.actions.closeCompare() })
     }
+    vm.actions.noteEditor?.let { editor ->
+        NoteSheet(
+            state = editor,
+            onSave = { vm.actions.saveNote(it) },
+            onDelete = { vm.actions.deleteNote() },
+            onDismiss = { vm.actions.closeNote() },
+        )
+    }
     if (vm.sheetVisible) {
         VersionBottomSheet(
             versions = BibleVersionRegistry.all,
@@ -216,6 +224,7 @@ private fun ReaderBody(
             onHighlight = { vm.highlightSelection(it) },
             onRemoveHighlight = { vm.clearSelectionHighlight() },
             onCompare = { vm.compareSelection() },
+            onNote = { vm.noteSelection() },
             onCopy = {
                 vm.selectedVersesText()?.let { text ->
                     clipboard.setText(AnnotatedString(text))

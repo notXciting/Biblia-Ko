@@ -11,6 +11,7 @@ import com.example.biblia.data.repository.BibleRepository
 import com.example.biblia.data.repository.ChapterCache
 import com.example.biblia.data.repository.SettingsRepository
 import com.example.biblia.data.user.HighlightRepository
+import com.example.biblia.data.user.NoteRepository
 import com.example.biblia.data.user.UserDatabase
 import com.example.biblia.data.tts.AndroidPlaybackFocus
 import com.example.biblia.data.tts.AndroidTtsEngine
@@ -44,6 +45,7 @@ class AppContainer(context: Context) {
     /** User data (highlights): separate DB that is never destructively migrated. */
     val userDatabase: UserDatabase = UserDatabase.build(appContext)
     val highlightRepository = HighlightRepository(userDatabase.highlightDao())
+    val noteRepository = NoteRepository(userDatabase.noteDao())
 
     private val parsers: Map<String, BibleParser> = mapOf(
         BibleVersion.FORMAT_TAGALOG_XML to TagalogXmlBibleParser(),

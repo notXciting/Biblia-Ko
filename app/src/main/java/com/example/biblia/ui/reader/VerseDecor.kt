@@ -1,6 +1,15 @@
 package com.example.biblia.ui.reader
 
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.material3.Icon
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -55,3 +64,12 @@ internal suspend fun scrollToSpokenVerse(
         state.animateScrollTo((top - topMargin).toInt().coerceAtLeast(0))
     }
 }
+
+/** The note icon drawn inline after a verse that has a note (tap opens it). */
+internal fun noteInlineContent(accent: Color): Map<String, InlineTextContent> = mapOf(
+    NOTE_MARKER_ID to InlineTextContent(
+        Placeholder(width = 1.1.em, height = 1.em, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
+    ) {
+        Icon(Icons.Outlined.EditNote, contentDescription = null, tint = accent, modifier = Modifier.fillMaxSize())
+    },
+)

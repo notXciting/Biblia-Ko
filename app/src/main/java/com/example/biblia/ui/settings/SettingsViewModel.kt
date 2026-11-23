@@ -73,6 +73,8 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
 
     fun showVoiceHelp(language: String, status: VoiceStatus) = container.tts.showVoiceHelp(language, status)
 
+    fun setUiScale(value: Float) { viewModelScope.launch { settingsRepo.setUiScale(value) } }
+
     fun setTtsRate(value: Float) { viewModelScope.launch { settingsRepo.setTtsRate(value) } }
     fun setTtsPitch(value: Float) { viewModelScope.launch { settingsRepo.setTtsPitch(value) } }
     fun setTtsSpeakNumbers(value: Boolean) { viewModelScope.launch { settingsRepo.setTtsSpeakNumbers(value) } }
