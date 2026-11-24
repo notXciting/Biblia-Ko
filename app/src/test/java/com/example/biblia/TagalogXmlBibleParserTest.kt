@@ -12,7 +12,7 @@ import org.kxml2.io.KXmlParser
 import java.io.File
 
 /**
- * Parses the REAL Tagalog2012Bible.xml (workspace root) and asserts the exact
+ * Parses the REAL MBB12 text (assets/bibles/tagalog2012.xml) and asserts the exact
  * expected structure: 66 books, 1189 chapters, 30692 verses, 179 empty verses.
  */
 class TagalogXmlBibleParserTest {
@@ -48,14 +48,14 @@ class TagalogXmlBibleParserTest {
         }
     }
 
+    /** The bundled asset the app actually imports (Gradle runs tests from app/). */
     private fun realFile(): File {
         val candidates = listOf(
-            File("../Tagalog2012Bible.xml"),
-            File("Tagalog2012Bible.xml"),
-            File("../../Tagalog2012Bible.xml"),
+            File("src/main/assets/bibles/tagalog2012.xml"),
+            File("app/src/main/assets/bibles/tagalog2012.xml"),
         )
         return candidates.firstOrNull { it.exists() }
-            ?: error("Tagalog2012Bible.xml not found. Tried: ${candidates.map { it.absolutePath }}")
+            ?: error("tagalog2012.xml not found. Tried: ${candidates.map { it.absolutePath }}")
     }
 
     private fun parseRealFile(): Collector {

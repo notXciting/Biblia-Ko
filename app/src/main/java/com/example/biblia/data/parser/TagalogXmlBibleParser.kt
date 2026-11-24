@@ -5,7 +5,7 @@ import org.xmlpull.v1.XmlPullParser
 import java.io.InputStream
 
 /**
- * Streaming XmlPullParser implementation for the Tagalog2012Bible.xml schema:
+ * Streaming XmlPullParser implementation for the bundled Bible XML schema (e.g. assets/bibles/tagalog2012.xml):
  *
  * <bible translation="..." status="..." link="...">
  *   <testament name="Old|New">
