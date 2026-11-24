@@ -11,3 +11,7 @@ build
 *.log
 # Personal Claude Code permissions (machine-specific)
 .claude/settings.local.json
+
+# Local notes for Claude Code (kept on this PC, not on GitHub)
+CLAUDE.md
+PROGRESS.md
