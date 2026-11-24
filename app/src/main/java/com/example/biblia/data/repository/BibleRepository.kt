@@ -1,6 +1,7 @@
 package com.example.biblia.data.repository
 
 import com.example.biblia.data.db.BibleDao
+import com.example.biblia.data.db.SearchIndex
 import com.example.biblia.domain.model.BookFilter
 import com.example.biblia.domain.model.ChapterContent
 import com.example.biblia.domain.model.Verse
@@ -9,7 +10,7 @@ import com.example.biblia.domain.search.SearchQueryBuilder
 import java.util.concurrent.ConcurrentHashMap
 
 /** Read API over the Room database; the UI never touches the DAO directly. */
-class BibleRepository(private val dao: BibleDao) {
+class BibleRepository(private val dao: BibleDao, private val searchIndex: SearchIndex) {
 
     private val chapterCountsCache = ConcurrentHashMap<String, Map<Int, Int>>()
 
@@ -51,8 +52,7 @@ class BibleRepository(private val dao: BibleDao) {
         val books = filter.books
         // A non-contiguous filter (e.g. Prison Letters) needs IN, not BETWEEN.
         suspend fun run(match: String) =
-            dao.search(versionId, match, books == null, books ?: listOf(0), limit)
-                .map { Verse(it.book, it.chapter, it.verse, it.text) }
+            searchIndex.search(versionId, match, books, limit).map { Verse(it.book, it.chapter, it.verse, it.text) }
         // Exact phrase first ("pag ibig" -> pag-ibig), then verses with all the words.
         val phrase = SearchQueryBuilder.buildPhraseQuery(query)?.let { run(it) }.orEmpty()
         if (phrase.size >= limit) return phrase

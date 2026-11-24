@@ -9,8 +9,12 @@ package com.example.biblia.domain.search
  */
 object SearchIndexText {
 
-    /** Bump when [of] changes; installed Bibles are re-indexed once on startup. */
-    const val FORMAT = 2
+    /**
+     * Bump when [of] or the index layout changes; installed Bibles are
+     * re-indexed once on startup. 2 = joined compounds; 3 = per-version
+     * contentless tables (data/db/SearchSql).
+     */
+    const val FORMAT = 3
 
     private val compound = Regex("[\\p{L}\\p{N}]+(?:[-‐‑][\\p{L}\\p{N}]+)+")
     private val hyphens = Regex("[-‐‑]")

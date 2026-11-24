@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.biblia"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "2.2.0"
+        versionCode = 7
+        versionName = "2.3.0"
     }
 
     testOptions {
@@ -93,6 +93,8 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.kxml2)
+    // Real SQLite (with FTS4) for the search-index SQL tests; test-only, not packaged.
+    testImplementation(libs.sqlite.jdbc)
     testImplementation(libs.kotlinx.coroutines.test)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

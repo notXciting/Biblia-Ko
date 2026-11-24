@@ -187,4 +187,6 @@
     <string name="settings_ui_scale">Laki ng app</string>
     <string name="settings_ui_scale_hint">Palakihin o paliitin ang buong app: mga button, menu at teksto. Hiwalay ito sa display size ng telepono.</string>
     <string name="settings_ui_scale_reset">Ibalik sa 100%</string>
+    <string name="search_preparing">Inihahanda pa ang paghahanap</string>
+    <string name="search_preparing_hint">Inaayos ang paghahanap para sa Bibliang ito pagkatapos ng update. Ilang saglit lang ito at kusang lalabas ang mga resulta.</string>
 </resources>

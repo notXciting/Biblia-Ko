@@ -5,7 +5,7 @@ import android.util.Log
 import com.example.biblia.data.BibleVersion
 import com.example.biblia.data.db.BibleDatabase
 import com.example.biblia.data.db.VerseEntity
-import com.example.biblia.data.db.VerseFtsEntity
+import com.example.biblia.data.db.SearchIndex
 import com.example.biblia.data.db.VersionMetaEntity
 import com.example.biblia.data.parser.BibleMetadata
 import com.example.biblia.data.parser.BibleParser
@@ -34,12 +34,15 @@ class BibleImporter(
     private val context: Context,
     private val database: BibleDatabase,
     private val settings: SettingsRepository,
+    private val searchIndex: SearchIndex,
     private val parserSelector: (BibleVersion) -> BibleParser,
     private val onImported: (versionId: String) -> Unit = {},
 ) {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val mutex = Mutex()
+    /** Imported during this process, already in the current index format. */
+    private val importedThisRun = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
     private val _states = MutableStateFlow<Map<String, ImportState>>(emptyMap())
     val states: StateFlow<Map<String, ImportState>> = _states.asStateFlow()
 
@@ -75,27 +78,31 @@ class BibleImporter(
     }
 
     /**
-     * One-time re-index after [SearchIndexText.FORMAT] changes (e.g. joined
-     * compounds for "pagibig"). Rebuilds the FTS rows of every installed
-     * version from the verses already in Room; no re-import, highlights and
-     * position untouched. Each version is swapped in one transaction, so a
-     * search meanwhile still sees the old index.
+     * Startup upkeep, once per launch: deletes leftover XML copies, then
+     * rebuilds the search index of every installed version that has none in
+     * the current format (after the v2 database upgrade, or a
+     * [SearchIndexText.FORMAT] bump), current Bible first, and compacts once.
+     * Rebuilding reads the verses already in Room: no re-import; highlights,
+     * notes and position are in user.db and untouched.
      */
-    suspend fun upgradeSearchIndex(versions: List<BibleVersion>) = withContext(Dispatchers.IO) {
-        if (settings.searchIndexFormat() >= SearchIndexText.FORMAT) return@withContext
+    suspend fun upgradeSearchIndex(versions: List<BibleVersion>, currentId: String) = withContext(Dispatchers.IO) {
         mutex.withLock {
-            val dao = database.bibleDao()
-            for (version in versions) {
-                if (!settings.isImported(version.id)) continue
-                val rows = dao.verseTexts(version.id)
-                database.runInTransaction {
-                    dao.deleteFtsForVersion(version.id)
-                    // Inserted in id order: docids stay canonical (search ORDER BY docid).
-                    rows.chunked(BATCH_SIZE).forEach { chunk ->
-                        dao.insertVerseFts(chunk.map { VerseFtsEntity(it.id, SearchIndexText.of(it.text)) })
-                    }
-                }
+            context.clearBibleImportCache()
+            val formatChanged = settings.searchIndexFormat() < SearchIndexText.FORMAT
+            val todo = versions.filter { v ->
+                settings.isImported(v.id) && v.id !in importedThisRun && (formatChanged || !searchIndex.exists(v.id))
+            }.sortedBy { it.id != currentId }
+            if (todo.isEmpty()) {
+                if (formatChanged) settings.setSearchIndexFormat(SearchIndexText.FORMAT)
+                return@withLock
             }
+            searchIndex.markPending(todo.map { it.id })
+            for (version in todo) {
+                runCatching { searchIndex.rebuildFromVerses(version.id, BATCH_SIZE) }
+                    .onFailure { Log.e(TAG, "Index rebuild failed for " + version.id, it) }
+                searchIndex.markReady(version.id)
+            }
+            searchIndex.compact(vacuum = true) // reclaims the old shared index's pages
             settings.setSearchIndexFormat(SearchIndexText.FORMAT)
         }
     }
@@ -105,8 +112,9 @@ class BibleImporter(
         setState(version.id, ImportState.Phase.RUNNING, 0f)
 
         // Clear any partial data from a previously interrupted import.
-        dao.deleteFtsForVersion(version.id)
+        searchIndex.drop(version.id)
         dao.deleteVersesForVersion(version.id)
+        searchIndex.recreate(version.id)
 
         val cacheFile = context.copyBibleAssetToCache(version)
         val totalBytes = cacheFile.length().coerceAtLeast(1L)
@@ -117,12 +125,8 @@ class BibleImporter(
             if (pendingVerses.isEmpty()) return
             database.runInTransaction {
                 val ids = dao.insertVerses(pendingVerses)
-                val ftsRows = ArrayList<VerseFtsEntity>(ids.size)
-                for (i in ids.indices) {
-                    val verse = pendingVerses[i]
-                    ftsRows.add(VerseFtsEntity(verseId = ids[i], normText = SearchIndexText.of(verse.text)))
-                }
-                dao.insertVerseFts(ftsRows)
+                // docid = verse id: imported Genesis -> Revelation, so canonical order.
+                searchIndex.insert(version.id, ids, pendingVerses.map { it.text })
             }
             pendingVerses.clear()
         }
@@ -165,6 +169,10 @@ class BibleImporter(
         flush()
 
         if (dao.verseCount(version.id) == 0) error("Import produced 0 verses for " + version.id)
+        searchIndex.optimize(version.id)
+        cacheFile.delete() // the XML copy was only needed for byte-accurate progress
+        searchIndex.compact(vacuum = false) // trim the write-ahead log
+        importedThisRun += version.id
 
         settings.markImported(version.id)
         onImported(version.id)

@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.biblia.data.BibleVersion
 import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.db.BibleDatabase
+import com.example.biblia.data.db.SearchIndex
 import com.example.biblia.data.importer.BibleImporter
 import com.example.biblia.data.parser.BibleParser
 import com.example.biblia.data.parser.TagalogXmlBibleParser
@@ -34,7 +35,9 @@ class AppContainer(context: Context) {
 
     val database: BibleDatabase = BibleDatabase.build(appContext)
     val settingsRepository = SettingsRepository(appContext)
-    val bibleRepository = BibleRepository(database.bibleDao())
+    /** Per-version full-text search tables (outside Room's schema). */
+    val searchIndex = SearchIndex(database)
+    val bibleRepository = BibleRepository(database.bibleDao(), searchIndex)
     val navigationBus = NavigationBus()
 
     /** Application-wide background scope for fire-and-forget preloads. */
@@ -55,6 +58,7 @@ class AppContainer(context: Context) {
         context = appContext,
         database = database,
         settings = settingsRepository,
+        searchIndex = searchIndex,
         parserSelector = { version: BibleVersion ->
             parsers[version.formatId] ?: TagalogXmlBibleParser()
         },
@@ -75,7 +79,9 @@ class AppContainer(context: Context) {
     init {
         // Re-index installed Bibles once when the search index format changes.
         applicationScope.launch {
-            runCatching { importer.upgradeSearchIndex(BibleVersionRegistry.all) }
+            runCatching {
+                importer.upgradeSearchIndex(BibleVersionRegistry.all, settingsRepository.initial().versionId)
+            }
         }
         mainScope.launch {
             settingsRepository.settings.map { it.tts }.distinctUntilChanged().collect { tts.updatePrefs(it) }

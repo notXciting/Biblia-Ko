@@ -61,6 +61,9 @@ class SelectionViewModel(
     var currentVerse by mutableStateOf(0); private set
     var chapterCounts by mutableStateOf<Map<Int, Int>>(emptyMap()); private set
 
+    /** This Bible's search index is still being rebuilt (after an app update). */
+    var indexPending by mutableStateOf(false); private set
+
     init {
         viewModelScope.launch {
             val s = settingsRepo.initial()
@@ -70,6 +73,14 @@ class SelectionViewModel(
             selectedBook = s.book
             selectedChapter = s.chapter
             chapterCounts = repo.chapterCounts(version.id)
+        }
+        viewModelScope.launch {
+            container.searchIndex.pending.collect { pending ->
+                val wasPending = indexPending
+                indexPending = version.id in pending
+                // Index just finished: run the typed search for real.
+                if (wasPending && !indexPending && searchActive && query.isNotBlank()) refreshSearch()
+            }
         }
     }
 

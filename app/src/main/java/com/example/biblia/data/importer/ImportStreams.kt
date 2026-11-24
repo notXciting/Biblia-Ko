@@ -71,3 +71,8 @@ fun Context.copyBibleAssetToCache(version: BibleVersion): File {
     }
     return target
 }
+
+/** Deletes leftover XML copies (older versions never removed them: ~5 MB per Bible). */
+fun Context.clearBibleImportCache() {
+    File(cacheDir, "bible_imports").listFiles()?.forEach { it.delete() }
+}

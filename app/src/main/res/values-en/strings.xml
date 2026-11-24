@@ -186,4 +186,6 @@
     <string name="settings_ui_scale">App size</string>
     <string name="settings_ui_scale_hint">Make the whole app bigger or smaller: buttons, menus and text. Independent of the phone display size.</string>
     <string name="settings_ui_scale_reset">Reset to 100%</string>
+    <string name="search_preparing">Preparing search</string>
+    <string name="search_preparing_hint">Search for this Bible is being set up after the update. It only takes a moment, and results will appear automatically.</string>
 </resources>

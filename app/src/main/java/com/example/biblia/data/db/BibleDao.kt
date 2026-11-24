@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.sqlite.db.SupportSQLiteQuery
 
 /** Narrow projection for full-text search (only the columns the UI needs). */
 data class VerseSearchRow(
@@ -29,14 +31,8 @@ interface BibleDao {
     @Insert
     fun insertVerses(verses: List<VerseEntity>): List<Long>
 
-    @Insert
-    fun insertVerseFts(rows: List<VerseFtsEntity>)
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertVersionMeta(meta: VersionMetaEntity)
-
-    @Query("DELETE FROM verses_fts WHERE verse_id IN (SELECT id FROM verses WHERE versionId = :versionId)")
-    fun deleteFtsForVersion(versionId: String)
 
     /** Verse ids + text in canonical (id) order, for rebuilding the FTS index. */
     @Query("SELECT id, text FROM verses WHERE versionId = :versionId ORDER BY id")
@@ -74,32 +70,7 @@ interface BibleDao {
     @Query("SELECT * FROM version_meta WHERE versionId = :versionId")
     suspend fun versionMeta(versionId: String): VersionMetaEntity?
 
-    /**
-     * Full-text search with prefix terms on the FTS4 table. Selects only the
-     * needed columns; caller supplies LIMIT via :limit and book filter range.
-     */
-    @Query(
-        // FTS docids were assigned in canonical order (each version is imported
-        // Genesis -> Revelation), so ORDER BY f.docid == ORDER BY book, chapter,
-        // verse. CROSS JOIN keeps the FTS table as the outer loop, whose MATCH
-        // already yields docid order: SQLite streams rows and stops at :limit
-        // instead of materializing and sorting every match ("ang" matched
-        // ~30k verses and took > 3 s on device).
-        """SELECT v.book AS book, v.chapter AS chapter, v.verse AS verse, v.text AS text
-           FROM verses_fts f
-           CROSS JOIN verses v ON v.id = f.verse_id
-           WHERE verses_fts MATCH :matchQuery
-             AND v.versionId = :versionId
-             AND v.text != ''
-             AND (:allBooks OR v.book IN (:books))
-           ORDER BY f.docid
-           LIMIT :limit"""
-    )
-    suspend fun search(
-        versionId: String,
-        matchQuery: String,
-        allBooks: Boolean,
-        books: List<Int>,
-        limit: Int,
-    ): List<VerseSearchRow>
+    /** Full-text search; SQL from [SearchSql.search] (per-version FTS tables Room doesn't know). */
+    @RawQuery
+    suspend fun search(query: SupportSQLiteQuery): List<VerseSearchRow>
 }

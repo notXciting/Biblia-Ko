@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -103,7 +104,7 @@ fun SearchResults(
         }
         if (vm.reference != null) return@Column
         if (!vm.searching && vm.results.isEmpty()) {
-            EmptySearchState(Modifier.weight(1f))
+            EmptySearchState(preparing = vm.indexPending, modifier = Modifier.weight(1f))
         } else {
             val onOpenVerse: (Verse) -> Unit = { verse ->
                 vm.pickSearchResult(verse, onVerseSelected)
@@ -135,7 +136,7 @@ private fun referenceLabel(ref: VerseReference): String {
 }
 
 @Composable
-private fun EmptySearchState(modifier: Modifier = Modifier) {
+private fun EmptySearchState(preparing: Boolean, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -144,19 +145,19 @@ private fun EmptySearchState(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.Center,
     ) {
         Icon(
-            imageVector = Icons.Filled.SearchOff,
+            imageVector = if (preparing) Icons.Filled.HourglassTop else Icons.Filled.SearchOff,
             contentDescription = null,
             tint = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.size(40.dp),
         )
         Spacer(Modifier.height(12.dp))
         Text(
-            text = stringResource(R.string.search_no_results),
+            text = stringResource(if (preparing) R.string.search_preparing else R.string.search_no_results),
             style = MaterialTheme.typography.titleMedium,
         )
         Spacer(Modifier.height(4.dp))
         Text(
-            text = stringResource(R.string.search_no_results_hint),
+            text = stringResource(if (preparing) R.string.search_preparing_hint else R.string.search_no_results_hint),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
