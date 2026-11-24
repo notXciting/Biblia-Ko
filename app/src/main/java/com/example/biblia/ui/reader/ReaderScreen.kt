@@ -71,6 +71,7 @@ fun ReaderScreen(
     settings: AppSettings,
     onOpenSelection: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
+    onOpenNotes: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val vm: ReaderViewModel = viewModel(
@@ -87,6 +88,7 @@ fun ReaderScreen(
             onLocationClick = onOpenSelection,
             onVersionClick = { vm.openVersionSheet() },
             listening = tts.isActive,
+            onNotesClick = onOpenNotes,
             onListenClick = { if (tts.isActive) container.tts.stop() else vm.startListening() },
         )
         if (vm.ready) {

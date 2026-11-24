@@ -224,6 +224,8 @@ data class AppSettings(
     val tts: com.example.biblia.domain.tts.TtsPrefs = com.example.biblia.domain.tts.TtsPrefs(),
     /** Whole-app UI size multiplier (Settings > "Laki ng app"); 1 = phone default. */
     val uiScale: Float = 1f,
+    /** Order of the notes list ("Mga Tala"). */
+    val noteSort: NoteSort = NoteSort.RECENT,
 )
 
 /** Range and step of the app UI size setting. */

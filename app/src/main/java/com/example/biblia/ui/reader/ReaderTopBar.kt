@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.material.icons.outlined.Headphones
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.rounded.KeyboardArrowDown
@@ -47,6 +48,7 @@ fun ReaderTopBar(
     modifier: Modifier = Modifier,
     listening: Boolean = false,
     onListenClick: () -> Unit = {},
+    onNotesClick: () -> Unit = {},
 ) {
     Surface(color = MaterialTheme.colorScheme.background, modifier = modifier.fillMaxWidth()) {
         Column(Modifier.statusBarsPadding()) {
@@ -96,6 +98,13 @@ fun ReaderTopBar(
                             modifier = Modifier.size(22.dp),
                         )
                     }
+                }
+                IconButton(onClick = onNotesClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.EditNote,
+                        contentDescription = stringResource(R.string.notes_title),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                 }
                 IconButton(onClick = onListenClick) {
                     Icon(

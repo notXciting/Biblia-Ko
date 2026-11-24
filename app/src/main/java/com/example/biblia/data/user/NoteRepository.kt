@@ -11,6 +11,9 @@ class NoteRepository(private val dao: NoteDao) {
     fun observeChapter(book: Int, chapter: Int): Flow<List<VerseNote>> =
         dao.observeChapter(book, chapter).map { rows -> rows.mapNotNull(::toNote) }
 
+    /** Every note, most recently edited first (the notes list). */
+    fun observeAll(): Flow<List<VerseNote>> = dao.observeAll().map { rows -> rows.mapNotNull(::toNote) }
+
     suspend fun chapter(book: Int, chapter: Int): List<VerseNote> = dao.chapter(book, chapter).mapNotNull(::toNote)
 
     suspend fun byId(id: Long): VerseNote? = dao.byId(id)?.let(::toNote)
@@ -46,6 +49,6 @@ class NoteRepository(private val dao: NoteDao) {
     private fun toNote(row: NoteEntity): VerseNote? {
         val verses = NoteVerses.decode(row.verses)
         if (verses.isEmpty()) return null
-        return VerseNote(row.id, row.book, row.chapter, verses, row.text, row.updatedAt)
+        return VerseNote(row.id, row.book, row.chapter, verses, row.text, row.updatedAt, row.createdAt)
     }
 }

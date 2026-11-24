@@ -17,6 +17,7 @@ import com.example.biblia.domain.model.HighlightColor
 import com.example.biblia.domain.reference.ReferenceFormatter
 import com.example.biblia.domain.tts.TtsStatus
 import com.example.biblia.domain.model.VerseReference
+import com.example.biblia.domain.model.NoteVerses
 import com.example.biblia.domain.model.VerseSpans
 import com.example.biblia.domain.model.VersionMeta
 import com.example.biblia.perf.VersePerf
@@ -341,9 +342,7 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
     /** Text of the verses (from the current chapter) shown above a note. */
     private fun quoteOf(verses: Set<Int>): String {
         val content = currentContent ?: return ""
-        return content.verses
-            .filter { v -> !v.isEmpty && (v.verse..VerseSpans.end(v.verse, content.spanEnds)).any { it in verses } }
-            .joinToString(" ") { it.text }
+        return NoteVerses.quote(content.verses, content.spanEnds, verses)
     }
 
     fun compareSelection() {

@@ -28,6 +28,9 @@ interface HighlightDao {
     @Query("SELECT * FROM highlights WHERE book = :book AND chapter = :chapter")
     fun observeChapter(book: Int, chapter: Int): Flow<List<HighlightEntity>>
 
+    @Query("SELECT * FROM highlights")
+    suspend fun all(): List<HighlightEntity>
+
     @Upsert
     suspend fun upsert(rows: List<HighlightEntity>)
 

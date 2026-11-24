@@ -36,6 +36,8 @@ data class NoteEditorState(
     val quote: String,
     val noteId: Long?,
     val text: String,
+    /** When the note was last saved (null = new note). */
+    val updatedAt: Long? = null,
 )
 
 /** Compare sheet state: the reference plus one row per registered version. */
@@ -62,7 +64,9 @@ class VerseActions(private val container: AppContainer, private val scope: Corou
         if (verses.isEmpty()) return
         scope.launch {
             val existing = NoteVerses.exact(noteRepo.chapter(book, chapter), verses)
-            noteEditor = NoteEditorState(reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty())
+            noteEditor = NoteEditorState(
+                reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty(), existing?.updatedAt,
+            )
         }
     }
 
@@ -70,7 +74,9 @@ class VerseActions(private val container: AppContainer, private val scope: Corou
     fun openNoteById(id: Long, reference: (VerseNote) -> String, quote: (VerseNote) -> String) {
         scope.launch {
             val note = noteRepo.byId(id) ?: return@launch
-            noteEditor = NoteEditorState(reference(note), note.book, note.chapter, note.verses, quote(note), note.id, note.text)
+            noteEditor = NoteEditorState(
+                reference(note), note.book, note.chapter, note.verses, quote(note), note.id, note.text, note.updatedAt,
+            )
         }
     }
 

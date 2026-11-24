@@ -161,6 +161,8 @@ fun SettingsScreen(
                 onTest = { vm.testVoice(BibleVersionRegistry.byId(settings.versionId).language) },
             )
             Spacer(Modifier.height(8.dp))
+            BackupSection(container = container)
+            Spacer(Modifier.height(8.dp))
             AboutSection(currentVersionId = settings.versionId)
         }
     }

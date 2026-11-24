@@ -32,6 +32,12 @@ interface NoteDao {
     @Query("SELECT * FROM notes WHERE book = :book AND chapter = :chapter ORDER BY firstVerse, createdAt")
     fun observeChapter(book: Int, chapter: Int): Flow<List<NoteEntity>>
 
+    @Query("SELECT * FROM notes ORDER BY updatedAt DESC")
+    fun observeAll(): Flow<List<NoteEntity>>
+
+    @Query("SELECT * FROM notes")
+    suspend fun all(): List<NoteEntity>
+
     @Query("SELECT * FROM notes WHERE book = :book AND chapter = :chapter")
     suspend fun chapter(book: Int, chapter: Int): List<NoteEntity>
 

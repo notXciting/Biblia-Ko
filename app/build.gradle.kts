@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.biblia"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "2.3.0"
+        versionCode = 8
+        versionName = "2.4.0"
     }
 
     testOptions {
@@ -95,6 +95,8 @@ dependencies {
     testImplementation(libs.kxml2)
     // Real SQLite (with FTS4) for the search-index SQL tests; test-only, not packaged.
     testImplementation(libs.sqlite.jdbc)
+    // Android ships org.json, but JVM tests only see stubs: the real one for BackupCodec tests.
+    testImplementation(libs.org.json)
     testImplementation(libs.kotlinx.coroutines.test)
 
     debugImplementation(libs.androidx.compose.ui.tooling)

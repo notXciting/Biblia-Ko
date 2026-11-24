@@ -2,6 +2,7 @@ package com.example.biblia.di
 
 import android.content.Context
 import com.example.biblia.data.BibleVersion
+import com.example.biblia.data.backup.BackupRepository
 import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.db.BibleDatabase
 import com.example.biblia.data.db.SearchIndex
@@ -49,6 +50,9 @@ class AppContainer(context: Context) {
     val userDatabase: UserDatabase = UserDatabase.build(appContext)
     val highlightRepository = HighlightRepository(userDatabase.highlightDao())
     val noteRepository = NoteRepository(userDatabase.noteDao())
+
+    /** Settings + highlights + notes to/from a JSON file (Settings > Backup). */
+    val backupRepository = BackupRepository(appContext, userDatabase, settingsRepository)
 
     private val parsers: Map<String, BibleParser> = mapOf(
         BibleVersion.FORMAT_TAGALOG_XML to TagalogXmlBibleParser(),

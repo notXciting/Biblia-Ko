@@ -1,4 +1,4 @@
-﻿package com.example.biblia.ui
+package com.example.biblia.ui
 
 import android.util.Log
 import androidx.compose.animation.EnterTransition
@@ -19,17 +19,19 @@ import androidx.navigation.compose.rememberNavController
 import com.example.biblia.BuildConfig
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.ui.notes.NotesScreen
 import com.example.biblia.ui.reader.ReaderScreen
 import com.example.biblia.ui.selection.SelectionScreen
 import com.example.biblia.ui.settings.SettingsScreen
 
 private const val TAG = "VERSE_NAV"
 
-/** Routes: reader <-> selection, reader -> settings. */
+/** Routes: reader <-> selection, reader -> settings, reader -> notes. */
 object Routes {
     const val READER = "reader"
     const val SELECTION = "selection"
     const val SETTINGS = "settings"
+    const val NOTES = "notes"
 }
 
 /** Material "emphasized decelerate" / "accelerate" curves. */
@@ -62,6 +64,7 @@ fun BibleNavHost(container: AppContainer, settings: AppSettings, modifier: Modif
                 settings = settings,
                 onOpenSelection = { navController.navigate(Routes.SELECTION) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
+                onOpenNotes = { navController.navigate(Routes.NOTES) },
             )
         }
         composable(
@@ -104,6 +107,25 @@ fun BibleNavHost(container: AppContainer, settings: AppSettings, modifier: Modif
                 container = container,
                 settings = settings,
                 onBack = { navController.popBackStack() },
+            )
+        }
+        composable(
+            Routes.NOTES,
+            enterTransition = {
+                slideInHorizontally(tween(ENTER_MS, easing = Decelerate)) { it / 8 } +
+                    fadeIn(tween(ENTER_MS / 2))
+            },
+            popExitTransition = {
+                slideOutHorizontally(tween(EXIT_MS, easing = Accelerate)) { it / 8 } +
+                    fadeOut(tween(EXIT_MS))
+            },
+        ) {
+            NotesScreen(
+                container = container,
+                settings = settings,
+                onBack = { navController.popBackStack() },
+                // "Go to verse": the request is already on the bus, the reader applies it.
+                onOpenReader = { navController.popBackStack(Routes.READER, inclusive = false) },
             )
         }
     }

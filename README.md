@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v2.3.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v2.4.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -51,6 +51,7 @@ Tap any verse to open the verse panel:
 - **Copy** or **Share** with a formatted reference, e.g. *"…" – Juan 3:16-17 (MBB12)*.
 - **Compare** the selected verses side by side in every installed version.
 - **Notes:** write a personal note, prayer or reflection on one or more verses. A small note icon marks noted verses in the reader; tap it to read or edit the note. Like highlights, notes show in every translation.
+- **All your notes in one place:** the notebook button in the reader opens a searchable list of your notes, sorted by newest or in Bible order. Open a note to edit it, share it, or jump straight to its verse.
 
 ### Personalisation
 - **Seven themes:** System, Light, Sepia, Sage, Dark, Slate, and Midnight (true black for OLED screens).
@@ -58,6 +59,9 @@ Tap any verse to open the verse panel:
 - **App language:** Tagalog, English, or *Follow the Bible*, which uses Tagalog for Tagalog versions and English for English ones. Book names follow the selected Bible's language.
 - **App size:** make the whole app bigger or smaller (80%–130%), independent of the phone's display-size setting.
 - **Three home-screen icons** to choose from: Sunrise, Night and Sky.
+
+### Backup & transfer
+- **Export** your settings, highlights and notes to a file (Downloads, Google Drive, …) and **import** it on another phone. Importing only adds: nothing is deleted, and importing the same file twice is harmless. No storage permission is needed.
 
 <p align="center">
   <img src="docs/screenshots/versions.png" width="200" alt="Version picker">
@@ -68,7 +72,7 @@ Tap any verse to open the verse panel:
 
 ## Download & install
 
-1. Download **`BibliaKo-v2.3.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v2.4.0.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
 3. On first launch the app prepares the default Bible (a few seconds). Every other version is prepared the first time you select it.
 
@@ -111,7 +115,7 @@ All Bible texts remain the property of their respective copyright holders.
 - **Fast navigation:** the reader pages over a flat index of all 1,189 chapters. Jumping to a verse first loads the target chapter into a shared in-memory cache, so the reader's first frame already shows the text.
 - **Fast, compact search:** each version has its own lean full-text index that stores no second copy of the text. Results come back in Bible order straight from the index and stop at the result limit, so even very common words return in well under a second.
 - **Read aloud:** a pure-Kotlin `TtsController` queues one verse at a time and follows the reader across chapters and books. The Android speech engine and audio focus sit behind small interfaces, so the logic is unit-tested on the JVM, including offline-voice selection and missing-engine handling.
-- **Your data is kept separate:** highlights and notes live in their own database (`user.db`), so updating or re-importing a Bible never touches them. Schema changes there always use a real migration.
+- **Your data is kept separate:** highlights and notes live in their own database (`user.db`) and can be exported to a JSON backup, so updating or re-importing a Bible never touches them. Schema changes there always use a real migration.
 
 ## Building from source
 
@@ -124,7 +128,7 @@ sdk.dir=C\:\\path\\to\\Android\\Sdk
 ```bash
 ./gradlew assembleDebug          # debug APK  -> app/build/outputs/apk/debug/
 ./gradlew assembleRelease        # release APK -> app/build/outputs/apk/release/
-./gradlew :app:testDebugUnitTest # unit tests (80)
+./gradlew :app:testDebugUnitTest # unit tests (86)
 ```
 
 On Windows, use `gradlew.bat`. To run a single test class:

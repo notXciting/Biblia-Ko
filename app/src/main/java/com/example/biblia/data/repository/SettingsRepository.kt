@@ -13,6 +13,7 @@ import com.example.biblia.domain.model.AppIcon
 import com.example.biblia.domain.model.AppLanguage
 import com.example.biblia.domain.model.AppSettings
 import com.example.biblia.domain.model.LineSpacing
+import com.example.biblia.domain.model.NoteSort
 import com.example.biblia.domain.model.SearchScope
 import com.example.biblia.domain.model.ThemeMode
 import com.example.biblia.domain.model.UiScale
@@ -47,6 +48,7 @@ class SettingsRepository(private val context: Context) {
         val TTS_NUMBERS = booleanPreferencesKey("tts_speak_numbers")
         val SEARCH_INDEX_FORMAT = intPreferencesKey("search_index_format")
         val UI_SCALE = floatPreferencesKey("ui_scale")
+        val NOTE_SORT = stringPreferencesKey("note_sort")
         fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
@@ -68,6 +70,7 @@ class SettingsRepository(private val context: Context) {
             chapter = (p[Keys.LAST_CHAPTER] ?: 1).coerceAtLeast(1),
             verse = (p[Keys.LAST_VERSE] ?: 0).coerceAtLeast(0),
             uiScale = UiScale.clamp(p[Keys.UI_SCALE] ?: UiScale.DEFAULT),
+            noteSort = enumOrDefault(p[Keys.NOTE_SORT], NoteSort.RECENT),
             tts = TtsPrefs(
                 rate = (p[Keys.TTS_RATE] ?: 1f).coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = (p[Keys.TTS_PITCH] ?: 1f).coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),
@@ -95,6 +98,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSearchScope(value: SearchScope) = edit { it[Keys.SEARCH_SCOPE] = value.name }
     suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
 
+    suspend fun setNoteSort(value: NoteSort) = edit { it[Keys.NOTE_SORT] = value.name }
     suspend fun setUiScale(value: Float) = edit { it[Keys.UI_SCALE] = UiScale.clamp(value) }
     suspend fun setTtsRate(value: Float) =
         edit { it[Keys.TTS_RATE] = value.coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE) }
@@ -105,6 +109,29 @@ class SettingsRepository(private val context: Context) {
     /** [voiceName] null = the engine's default voice for that language. */
     suspend fun setTtsVoice(language: String, voiceName: String?) = edit {
         if (voiceName == null) it.remove(Keys.ttsVoice(language)) else it[Keys.ttsVoice(language)] = voiceName
+    }
+
+    /**
+     * Applies preferences from a backup in one write. Device state is kept:
+     * the open Bible, reading position, installed versions and index format.
+     */
+    suspend fun restorePreferences(s: AppSettings) = edit { p ->
+        p[Keys.APP_LANGUAGE] = s.appLanguage.name
+        p[Keys.APP_ICON] = s.appIcon.name
+        p[Keys.THEME_MODE] = s.themeMode.name
+        p[Keys.ACCENT] = s.accent.name
+        p[Keys.FONT_SIZE] = s.fontSizeSp.coerceIn(12f, 32f)
+        p[Keys.LINE_SPACING] = s.lineSpacing.name
+        p[Keys.VERSE_LAYOUT] = s.verseLayout.name
+        p[Keys.VIEW_MODE] = s.viewMode.name
+        p[Keys.SEARCH_SCOPE] = s.searchScope.name
+        p[Keys.UI_SCALE] = UiScale.clamp(s.uiScale)
+        p[Keys.NOTE_SORT] = s.noteSort.name
+        p[Keys.TTS_RATE] = s.tts.rate.coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE)
+        p[Keys.TTS_PITCH] = s.tts.pitch.coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH)
+        p[Keys.TTS_NUMBERS] = s.tts.speakVerseNumbers
+        // Voice names are per phone: unknown ones fall back to the best offline voice.
+        s.tts.voices.forEach { (language, voice) -> p[Keys.ttsVoice(language)] = voice }
     }
 
     /** Persists the last read position (verse == 0 means "no focused verse"). */
