@@ -14,10 +14,10 @@
 </div>
 
 <p align="center">
-  <img src="docs/screenshots/reader.png" width="200" alt="Reader">
-  <img src="docs/screenshots/jump-to-verse.png" width="200" alt="Jump to a verse">
-  <img src="docs/screenshots/verse-actions.png" width="200" alt="Verse actions">
-  <img src="docs/screenshots/compare.png" width="200" alt="Compare versions">
+  <img src="docs/screenshots/reader.png" width="200" alt="Reader with a highlight, a note and Listen reading aloud">
+  <img src="docs/screenshots/search.png" width="200" alt="Full-text search for pag-ibig">
+  <img src="docs/screenshots/verse-actions.png" width="200" alt="Verse panel: highlight, copy, share, compare, note">
+  <img src="docs/screenshots/compare.png" width="200" alt="Compare a passage across versions">
 </p>
 
 Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles ten translations (two Tagalog, eight English), searches across the whole Bible quickly, opens any verse instantly, and can **read the Bible aloud** in Tagalog or English using your phone's built-in offline voices.
@@ -64,10 +64,10 @@ Tap any verse to open the verse panel:
 - **Export** your settings, highlights and notes to a file (Downloads, Google Drive, …) and **import** it on another phone. Importing only adds: nothing is deleted, and importing the same file twice is harmless. No storage permission is needed.
 
 <p align="center">
-  <img src="docs/screenshots/versions.png" width="200" alt="Version picker">
-  <img src="docs/screenshots/filters.png" width="200" alt="Book filters">
-  <img src="docs/screenshots/books-grid.png" width="200" alt="Book grid">
-  <img src="docs/screenshots/verse-layout.png" width="200" alt="Verse layout setting">
+  <img src="docs/screenshots/notes.png" width="200" alt="All notes in one list">
+  <img src="docs/screenshots/note.png" width="200" alt="A note with go-to-verse and share">
+  <img src="docs/screenshots/versions.png" width="200" alt="Ten Bible versions">
+  <img src="docs/screenshots/themes.png" width="200" alt="Themes and accent colours (Takipsilim)">
 </p>
 
 ## Download & install
