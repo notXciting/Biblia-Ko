@@ -214,4 +214,12 @@
     <string name="backup_imported">Na-import: %1$d bagong marka, %2$d bagong tala. Naibalik ang mga setting.</string>
     <string name="backup_not_a_backup">Hindi ito backup ng Biblia Ko. Pumili ng file na ginawa ng I-export.</string>
     <string name="backup_failed">Hindi natapos. Subukang muli o pumili ng ibang lokasyon.</string>
+    <string name="crossrefs_title">Mga kaugnay na talata (%1$d)</string>
+    <string name="crossrefs_toggle">Ipakita o itago ang mga kaugnay na talata</string>
+    <string name="settings_crossrefs">Mga kaugnay na talata</string>
+    <string name="settings_crossrefs_show">Ipakita ang mga kaugnay na talata</string>
+    <string name="settings_crossrefs_hint">Lumalabas sa panel kapag pumili ka ng talata.</string>
+    <string name="crossref_font_serif">Serif (italic)</string>
+    <string name="crossref_font_sans">Sans</string>
+    <string name="about_crossrefs_credit">Mga kaugnay na talata mula sa OpenBible.info (CC BY 4.0), batay sa Treasury of Scripture Knowledge.</string>
 </resources>

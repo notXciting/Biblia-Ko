@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v2.4.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v3.0.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -50,6 +50,7 @@ Tap any verse to open the verse panel:
 - **Highlight** in five colours. Highlights are saved per verse and show in every translation.
 - **Copy** or **Share** with a formatted reference, e.g. *"…" – Juan 3:16-17 (MBB12)*.
 - **Compare** the selected verses side by side in every installed version.
+- **Cross-references:** the verse panel lists up to 10 related passages for the selected verse, with their text in the Bible you are reading. Tap one to jump to it. Works offline in all ten versions, including verses that a translation combines (e.g. Ruth 1:1-2).
 - **Notes:** write a personal note, prayer or reflection on one or more verses. A small note icon marks noted verses in the reader; tap it to read or edit the note. Like highlights, notes show in every translation.
 - **All your notes in one place:** the notebook button in the reader opens a searchable list of your notes, sorted by newest or in Bible order. Open a note to edit it, share it, or jump straight to its verse.
 
@@ -72,7 +73,7 @@ Tap any verse to open the verse panel:
 
 ## Download & install
 
-1. Download **`BibliaKo-v2.4.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v3.0.0.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
 3. On first launch the app prepares the default Bible (a few seconds). Every other version is prepared the first time you select it.
 
@@ -96,6 +97,8 @@ Tap any verse to open the verse panel:
 | **NLT** | New Living Translation | English | © 1996, 2004, 2015 Tyndale House Foundation |
 
 All Bible texts remain the property of their respective copyright holders.
+
+Cross-references from [OpenBible.info](https://www.openbible.info/labs/cross-references/) ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)), based on the Treasury of Scripture Knowledge.
 
 ## Tech stack
 
@@ -128,7 +131,7 @@ sdk.dir=C\:\\path\\to\\Android\\Sdk
 ```bash
 ./gradlew assembleDebug          # debug APK  -> app/build/outputs/apk/debug/
 ./gradlew assembleRelease        # release APK -> app/build/outputs/apk/release/
-./gradlew :app:testDebugUnitTest # unit tests (86)
+./gradlew :app:testDebugUnitTest # unit tests (96)
 ```
 
 On Windows, use `gradlew.bat`. To run a single test class:

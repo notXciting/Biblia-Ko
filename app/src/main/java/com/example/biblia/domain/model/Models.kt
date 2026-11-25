@@ -226,7 +226,13 @@ data class AppSettings(
     val uiScale: Float = 1f,
     /** Order of the notes list ("Mga Tala"). */
     val noteSort: NoteSort = NoteSort.RECENT,
+    /** Cross-references in the verse panel (Settings > "Mga kaugnay na talata"). */
+    val showCrossRefs: Boolean = true,
+    val crossRefFont: CrossRefFont = CrossRefFont.SERIF_ITALIC,
 )
+
+/** How cross-reference text is set in the verse panel. */
+enum class CrossRefFont { SERIF_ITALIC, SANS }
 
 /** Range and step of the app UI size setting. */
 object UiScale {

@@ -12,6 +12,7 @@ import com.example.biblia.domain.model.AccentColor
 import com.example.biblia.domain.model.AppIcon
 import com.example.biblia.domain.model.AppLanguage
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.model.CrossRefFont
 import com.example.biblia.domain.model.LineSpacing
 import com.example.biblia.domain.model.NoteSort
 import com.example.biblia.domain.model.SearchScope
@@ -49,6 +50,8 @@ class SettingsRepository(private val context: Context) {
         val SEARCH_INDEX_FORMAT = intPreferencesKey("search_index_format")
         val UI_SCALE = floatPreferencesKey("ui_scale")
         val NOTE_SORT = stringPreferencesKey("note_sort")
+        val SHOW_CROSS_REFS = booleanPreferencesKey("show_cross_refs")
+        val CROSS_REF_FONT = stringPreferencesKey("cross_ref_font")
         fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
@@ -71,6 +74,8 @@ class SettingsRepository(private val context: Context) {
             verse = (p[Keys.LAST_VERSE] ?: 0).coerceAtLeast(0),
             uiScale = UiScale.clamp(p[Keys.UI_SCALE] ?: UiScale.DEFAULT),
             noteSort = enumOrDefault(p[Keys.NOTE_SORT], NoteSort.RECENT),
+            showCrossRefs = p[Keys.SHOW_CROSS_REFS] ?: true,
+            crossRefFont = enumOrDefault(p[Keys.CROSS_REF_FONT], CrossRefFont.SERIF_ITALIC),
             tts = TtsPrefs(
                 rate = (p[Keys.TTS_RATE] ?: 1f).coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = (p[Keys.TTS_PITCH] ?: 1f).coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),
@@ -98,6 +103,8 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSearchScope(value: SearchScope) = edit { it[Keys.SEARCH_SCOPE] = value.name }
     suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
 
+    suspend fun setShowCrossRefs(value: Boolean) = edit { it[Keys.SHOW_CROSS_REFS] = value }
+    suspend fun setCrossRefFont(value: CrossRefFont) = edit { it[Keys.CROSS_REF_FONT] = value.name }
     suspend fun setNoteSort(value: NoteSort) = edit { it[Keys.NOTE_SORT] = value.name }
     suspend fun setUiScale(value: Float) = edit { it[Keys.UI_SCALE] = UiScale.clamp(value) }
     suspend fun setTtsRate(value: Float) =

@@ -10,7 +10,9 @@ import com.example.biblia.BuildConfig
 import com.example.biblia.data.BibleVersion
 import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.catalog.BookCatalog
+import com.example.biblia.data.crossref.CrossRefItem
 import com.example.biblia.di.AppContainer
+import com.example.biblia.di.openInReader
 import com.example.biblia.domain.model.BookNameLanguage
 import com.example.biblia.domain.model.ChapterContent
 import com.example.biblia.domain.model.HighlightColor
@@ -320,6 +322,27 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
     fun clearSelectionHighlight() {
         actions.clearHighlight(book, chapter, coveredSelection())
         clearSelection()
+    }
+
+    /** Cross-references of the selection, in the current version (empty while importing). */
+    var crossRefs by mutableStateOf<List<CrossRefItem>>(emptyList()); private set
+    private var crossRefJob: Job? = null
+
+    /** Reloads [crossRefs] for the current selection (called when it changes). */
+    fun loadCrossRefs(enabled: Boolean) {
+        crossRefJob?.cancel()
+        val verses = coveredSelection()
+        if (!enabled || verses.isEmpty()) { crossRefs = emptyList(); return }
+        val (v, b, c) = Triple(version.id, book, chapter)
+        crossRefJob = viewModelScope.launch {
+            crossRefs = runCatching { container.crossRefRepository.forSelection(v, b, c, verses) }.getOrDefault(emptyList())
+        }
+    }
+
+    /** Opens a cross-reference through the reader's navigation bus (same path as search jumps). */
+    fun openCrossRef(item: CrossRefItem) {
+        clearSelection()
+        viewModelScope.launch { container.openInReader(version.id, item.book, item.chapter, item.verse) }
     }
 
     /** "Tala": note on the selected verses (combined verses included), then closes the panel. */

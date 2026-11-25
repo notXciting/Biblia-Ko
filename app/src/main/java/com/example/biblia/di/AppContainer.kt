@@ -3,6 +3,9 @@ package com.example.biblia.di
 import android.content.Context
 import com.example.biblia.data.BibleVersion
 import com.example.biblia.data.backup.BackupRepository
+import com.example.biblia.data.crossref.CrossRefDatabase
+import com.example.biblia.data.crossref.CrossRefImporter
+import com.example.biblia.data.crossref.CrossRefRepository
 import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.db.BibleDatabase
 import com.example.biblia.data.db.SearchIndex
@@ -51,6 +54,11 @@ class AppContainer(context: Context) {
     val highlightRepository = HighlightRepository(userDatabase.highlightDao())
     val noteRepository = NoteRepository(userDatabase.noteDao())
 
+    /** Cross-references (OpenBible.info): own database, imported once in the background. */
+    val crossRefDatabase: CrossRefDatabase = CrossRefDatabase.build(appContext)
+    val crossRefImporter = CrossRefImporter(appContext, crossRefDatabase)
+    val crossRefRepository = CrossRefRepository(crossRefDatabase.crossRefDao(), bibleRepository, crossRefImporter.ready)
+
     /** Settings + highlights + notes to/from a JSON file (Settings > Backup). */
     val backupRepository = BackupRepository(appContext, userDatabase, settingsRepository)
 
@@ -81,6 +89,8 @@ class AppContainer(context: Context) {
     )
 
     init {
+        // Cross-references: one-time background import (the panel shows none until ready).
+        applicationScope.launch { runCatching { crossRefImporter.ensureImported() } }
         // Re-index installed Bibles once when the search index format changes.
         applicationScope.launch {
             runCatching {

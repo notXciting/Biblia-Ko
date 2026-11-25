@@ -73,6 +73,8 @@ fun VerseActionBar(
     onCompare: () -> Unit,
     onNote: () -> Unit,
     onClose: () -> Unit,
+    /** Shown under the actions (cross-references); empty by default. */
+    footer: @Composable () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
@@ -127,6 +129,7 @@ fun VerseActionBar(
                     ActionItem(Icons.Outlined.Translate, stringResource(R.string.verse_action_compare), onCompare, item)
                     ActionItem(Icons.Outlined.EditNote, stringResource(R.string.verse_action_note), onNote, item)
                 }
+                footer()
             }
         }
     }

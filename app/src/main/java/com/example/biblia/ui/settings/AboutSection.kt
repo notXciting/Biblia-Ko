@@ -43,6 +43,12 @@ fun AboutSection(currentVersionId: String, modifier: Modifier = Modifier) {
             LabeledValue(stringResource(R.string.settings_app_version), BuildConfig.VERSION_NAME)
             Spacer(Modifier.height(10.dp))
             LabeledValue(stringResource(R.string.settings_developer), DEVELOPER)
+            Spacer(Modifier.height(10.dp))
+            Text(
+                text = stringResource(R.string.about_crossrefs_credit),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
         SectionTitle(stringResource(R.string.settings_bible_versions), Modifier.padding(top = 12.dp))
         AboutCard {

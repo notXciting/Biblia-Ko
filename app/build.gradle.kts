@@ -14,8 +14,8 @@ android {
         applicationId = "com.example.biblia"
         minSdk = 24
         targetSdk = 35
-        versionCode = 8
-        versionName = "2.4.0"
+        versionCode = 9
+        versionName = "3.0.0"
     }
 
     testOptions {

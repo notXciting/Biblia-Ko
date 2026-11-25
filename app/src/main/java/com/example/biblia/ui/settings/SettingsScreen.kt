@@ -147,6 +147,13 @@ fun SettingsScreen(
                 },
             )
             Spacer(Modifier.height(8.dp))
+            CrossRefSettingsSection(
+                show = settings.showCrossRefs,
+                font = settings.crossRefFont,
+                onShow = { vm.setShowCrossRefs(it) },
+                onFont = { vm.setCrossRefFont(it) },
+            )
+            Spacer(Modifier.height(8.dp))
             ListenSection(
                 prefs = settings.tts,
                 languages = vm.ttsLanguages,

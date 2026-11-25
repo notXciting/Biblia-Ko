@@ -14,6 +14,7 @@ import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AccentColor
 import com.example.biblia.domain.model.AppIcon
 import com.example.biblia.domain.model.AppLanguage
+import com.example.biblia.domain.model.CrossRefFont
 import com.example.biblia.domain.model.LineSpacing
 import com.example.biblia.domain.model.ThemeMode
 import com.example.biblia.domain.model.Verse
@@ -72,6 +73,9 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
     }
 
     fun showVoiceHelp(language: String, status: VoiceStatus) = container.tts.showVoiceHelp(language, status)
+
+    fun setShowCrossRefs(value: Boolean) { viewModelScope.launch { settingsRepo.setShowCrossRefs(value) } }
+    fun setCrossRefFont(value: CrossRefFont) { viewModelScope.launch { settingsRepo.setCrossRefFont(value) } }
 
     fun setUiScale(value: Float) { viewModelScope.launch { settingsRepo.setUiScale(value) } }
 

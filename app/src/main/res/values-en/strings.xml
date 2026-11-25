@@ -213,4 +213,12 @@
     <string name="backup_imported">Imported: %1$d new highlights, %2$d new notes. Settings restored.</string>
     <string name="backup_not_a_backup">This is not a Biblia Ko backup. Choose a file made with Export.</string>
     <string name="backup_failed">Could not finish. Try again or choose another location.</string>
+    <string name="crossrefs_title">Cross-references (%1$d)</string>
+    <string name="crossrefs_toggle">Show or hide cross-references</string>
+    <string name="settings_crossrefs">Cross-references</string>
+    <string name="settings_crossrefs_show">Show cross-references</string>
+    <string name="settings_crossrefs_hint">Shown in the panel when you select a verse.</string>
+    <string name="crossref_font_serif">Serif (italic)</string>
+    <string name="crossref_font_sans">Sans</string>
+    <string name="about_crossrefs_credit">Cross-references from OpenBible.info (CC BY 4.0), based on the Treasury of Scripture Knowledge.</string>
 </resources>

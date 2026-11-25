@@ -79,6 +79,11 @@ fun ReaderScreen(
     )
     val importStates by container.importer.states.collectAsStateWithLifecycle()
     val tts by container.tts.state.collectAsStateWithLifecycle()
+    // Cross-references follow the selection; refreshed once the background import finishes.
+    val crossRefsReady by container.crossRefImporter.ready.collectAsStateWithLifecycle()
+    LaunchedEffect(vm.selectedVerses, vm.version.id, settings.showCrossRefs, crossRefsReady) {
+        vm.loadCrossRefs(settings.showCrossRefs)
+    }
 
     Column(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         ReaderTopBar(
@@ -227,6 +232,11 @@ private fun ReaderBody(
             onRemoveHighlight = { vm.clearSelectionHighlight() },
             onCompare = { vm.compareSelection() },
             onNote = { vm.noteSelection() },
+            footer = {
+                if (settings.showCrossRefs) {
+                    CrossRefSection(vm.crossRefs, settings.crossRefFont, onOpen = { vm.openCrossRef(it) })
+                }
+            },
             onCopy = {
                 vm.selectedVersesText()?.let { text ->
                     clipboard.setText(AnnotatedString(text))
