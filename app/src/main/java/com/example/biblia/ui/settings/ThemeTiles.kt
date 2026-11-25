@@ -141,6 +141,7 @@ private fun labelOf(mode: ThemeMode): Int = when (mode) {
     ThemeMode.SYSTEM -> R.string.theme_system
     ThemeMode.LIGHT -> R.string.theme_light
     ThemeMode.SEPIA -> R.string.theme_sepia
+    ThemeMode.PAPER -> R.string.theme_paper
     ThemeMode.SAGE -> R.string.theme_sage
     ThemeMode.DARK -> R.string.theme_dark
     ThemeMode.SLATE -> R.string.theme_slate

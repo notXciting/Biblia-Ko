@@ -65,4 +65,20 @@ class ThemeContrastTest {
             assertTrue(contrast(p.onSurfaceVariant, p.containerHigh) >= 4.5)
         }
     }
+
+    @Test
+    fun paperInkAndRedVerseNumbersReadableOnPageAndHighlights() {
+        val paper = ThemePalettes.PAPER
+        val red = paper.verseNumber!!
+        assertTrue("ink", contrast(paper.onBackground, paper.background) >= 4.5)
+        assertTrue("red numbers", contrast(red, paper.background) >= 4.5)
+        for (h in HighlightColor.entries) {
+            val bg = over(h.argb, 0.55, paper.background)
+            assertTrue("ink on $h", contrast(paper.onBackground, bg) >= 4.5)
+            assertTrue("red number on $h", contrast(red, bg) >= 3.0)
+        }
+        // Clearly not Sepia: lighter paper, and ink is not brown.
+        assertTrue(lum(paper.background) > lum(ThemePalettes.SEPIA.background) + 0.08)
+        assertTrue(paper.desk != null && ThemePalettes.SEPIA.desk == null)
+    }
 }

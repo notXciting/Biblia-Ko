@@ -12,6 +12,7 @@ import com.example.biblia.domain.model.AccentColor
 import com.example.biblia.domain.model.AppIcon
 import com.example.biblia.domain.model.AppLanguage
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.model.BarSize
 import com.example.biblia.domain.model.CrossRefFont
 import com.example.biblia.domain.model.LineSpacing
 import com.example.biblia.domain.model.NoteSort
@@ -52,6 +53,8 @@ class SettingsRepository(private val context: Context) {
         val NOTE_SORT = stringPreferencesKey("note_sort")
         val SHOW_CROSS_REFS = booleanPreferencesKey("show_cross_refs")
         val CROSS_REF_FONT = stringPreferencesKey("cross_ref_font")
+        val BAR_SIZE = stringPreferencesKey("bar_size")
+        val PAPER_GRAIN = booleanPreferencesKey("paper_grain")
         fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
@@ -76,6 +79,8 @@ class SettingsRepository(private val context: Context) {
             noteSort = enumOrDefault(p[Keys.NOTE_SORT], NoteSort.RECENT),
             showCrossRefs = p[Keys.SHOW_CROSS_REFS] ?: true,
             crossRefFont = enumOrDefault(p[Keys.CROSS_REF_FONT], CrossRefFont.SERIF_ITALIC),
+            barSize = enumOrDefault(p[Keys.BAR_SIZE], BarSize.NORMAL),
+            paperGrain = p[Keys.PAPER_GRAIN] ?: false,
             tts = TtsPrefs(
                 rate = (p[Keys.TTS_RATE] ?: 1f).coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = (p[Keys.TTS_PITCH] ?: 1f).coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),
@@ -103,6 +108,8 @@ class SettingsRepository(private val context: Context) {
     suspend fun setSearchScope(value: SearchScope) = edit { it[Keys.SEARCH_SCOPE] = value.name }
     suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
 
+    suspend fun setPaperGrain(value: Boolean) = edit { it[Keys.PAPER_GRAIN] = value }
+    suspend fun setBarSize(value: BarSize) = edit { it[Keys.BAR_SIZE] = value.name }
     suspend fun setShowCrossRefs(value: Boolean) = edit { it[Keys.SHOW_CROSS_REFS] = value }
     suspend fun setCrossRefFont(value: CrossRefFont) = edit { it[Keys.CROSS_REF_FONT] = value.name }
     suspend fun setNoteSort(value: NoteSort) = edit { it[Keys.NOTE_SORT] = value.name }
@@ -134,6 +141,10 @@ class SettingsRepository(private val context: Context) {
         p[Keys.SEARCH_SCOPE] = s.searchScope.name
         p[Keys.UI_SCALE] = UiScale.clamp(s.uiScale)
         p[Keys.NOTE_SORT] = s.noteSort.name
+        p[Keys.SHOW_CROSS_REFS] = s.showCrossRefs
+        p[Keys.CROSS_REF_FONT] = s.crossRefFont.name
+        p[Keys.BAR_SIZE] = s.barSize.name
+        p[Keys.PAPER_GRAIN] = s.paperGrain
         p[Keys.TTS_RATE] = s.tts.rate.coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE)
         p[Keys.TTS_PITCH] = s.tts.pitch.coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH)
         p[Keys.TTS_NUMBERS] = s.tts.speakVerseNumbers

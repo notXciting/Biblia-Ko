@@ -57,6 +57,16 @@ class NotesViewModel(private val container: AppContainer) : ViewModel() {
         }
     }
 
+    /** Opens the note for exactly [verses] (from a highlight): theirs if it exists, else a new one. */
+    fun openFor(book: Int, chapter: Int, verses: Set<Int>, reference: String, quote: String) {
+        viewModelScope.launch {
+            val existing = NoteVerses.exact(repo.chapter(book, chapter), verses)
+            editor = NoteEditorState(
+                reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty(), existing?.updatedAt,
+            )
+        }
+    }
+
     fun save(text: String) {
         val e = editor ?: return
         editor = null

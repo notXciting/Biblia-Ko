@@ -113,7 +113,13 @@ private fun ImportConfirmDialog(data: BackupData, onConfirm: () -> Unit, onDismi
         text = {
             KeepAppLocale {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(stringResource(R.string.backup_import_contents, data.highlights.size, data.notes.size))
+                    // Only mention settings when the file has them (they are optional in the format).
+                    Text(
+                        stringResource(
+                            if (data.settings != null) R.string.backup_import_contents else R.string.backup_import_contents_no_settings,
+                            data.highlights.size, data.notes.size,
+                        ),
+                    )
                     if (data.exportedAt > 0) {
                         Text(
                             stringResource(R.string.backup_import_date, formatNoteDate(data.exportedAt)),
@@ -121,7 +127,12 @@ private fun ImportConfirmDialog(data: BackupData, onConfirm: () -> Unit, onDismi
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    Text(stringResource(R.string.backup_import_merge_note), style = MaterialTheme.typography.bodySmall)
+                    Text(
+                        stringResource(
+                            if (data.settings != null) R.string.backup_import_merge_note else R.string.backup_import_merge_note_no_settings,
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
                 }
             }
         },
@@ -138,7 +149,8 @@ private fun ImportConfirmDialog(data: BackupData, onConfirm: () -> Unit, onDismi
 private fun backupMessageText(message: BackupMessage): String = when (message) {
     is BackupMessage.Exported -> stringResource(R.string.backup_exported, message.highlights, message.notes)
     is BackupMessage.Imported -> stringResource(
-        R.string.backup_imported, message.result.highlightsAdded, message.result.notesAdded,
+        if (message.result.settingsApplied) R.string.backup_imported else R.string.backup_imported_no_settings,
+        message.result.highlightsAdded, message.result.notesAdded,
     )
     BackupMessage.NotABackup -> stringResource(R.string.backup_not_a_backup)
     BackupMessage.Failed -> stringResource(R.string.backup_failed)

@@ -146,7 +146,7 @@
     <string name="listen_stop">Stop reading</string>
     <string name="listen_previous_verse">Previous verse</string>
     <string name="listen_next_verse">Next verse</string>
-    <string name="listen_reading">Reading aloud</string>
+    <string name="listen_reading">Now reading</string>
     <string name="listen_paused">Paused</string>
     <string name="listen_language_tagalog">Tagalog</string>
     <string name="listen_language_english">English</string>
@@ -187,9 +187,6 @@
     <string name="settings_ui_scale_reset">Reset to 100%</string>
     <string name="search_preparing">Preparing search</string>
     <string name="search_preparing_hint">Search for this Bible is being set up after the update. It only takes a moment, and results will appear automatically.</string>
-    <string name="notes_title">Notes</string>
-    <string name="notes_count">%1$d notes</string>
-    <string name="notes_search_hint">Search your notes</string>
     <string name="notes_sort_recent">Newest</string>
     <string name="notes_sort_bible">Bible order</string>
     <string name="notes_empty">No notes yet</string>
@@ -231,4 +228,25 @@
     <string name="bibles_unload_title">Remove %1$s?</string>
     <string name="bibles_unload_body">This frees about %1$d MB. You can load it again at any time. Your highlights and notes are not affected.</string>
     <string name="compare_add_version">Add a version</string>
+    <string name="backup_import_contents_no_settings">Contains %1$d highlights and %2$d notes.</string>
+    <string name="backup_import_merge_note_no_settings">They are added to your current data; nothing is deleted.</string>
+    <string name="backup_imported_no_settings">Imported: %1$d new highlights, %2$d new notes.</string>
+    <string name="study_title">My Study</string>
+    <string name="study_tab_notes">Notes (%1$d)</string>
+    <string name="study_tab_highlights">Highlights (%1$d)</string>
+    <string name="study_search_hint">Search notes and highlights</string>
+    <string name="highlights_empty">No highlights yet</string>
+    <string name="highlights_empty_hint">While reading, select a verse and tap a colour to highlight it.</string>
+    <string name="highlights_none_found">No matching highlights</string>
+    <string name="highlight_add_note">Add a note</string>
+    <string name="highlight_change_color">Change colour</string>
+    <string name="cd_more_options">More options</string>
+    <string name="settings_bar_size">Bar size</string>
+    <string name="settings_bar_size_hint">The top and bottom bars while reading. Compact shows only icons at the bottom.</string>
+    <string name="bar_size_compact">Compact</string>
+    <string name="bar_size_normal">Normal</string>
+    <string name="bar_size_large">Large</string>
+    <string name="theme_paper">Paper</string>
+    <string name="settings_paper_grain">Paper texture</string>
+    <string name="settings_paper_grain_hint">A faint paper grain on the reading page.</string>
 </resources>

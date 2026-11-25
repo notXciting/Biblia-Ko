@@ -8,11 +8,14 @@ package com.example.biblia.data
 data class BibleVersion(
     val id: String,
     val shortName: String,
+    /** Name shown in the reader, picker, Compare and Manage ("Magandang Balita Biblia"). */
     val fullName: String,
     val assetPath: String,
     val language: String,
     val copyright: String = "",
     val formatId: String = FORMAT_TAGALOG_XML,
+    /** Settings > About list name; adds the edition year where it matters ("Magandang Balita Biblia 2012"). */
+    val catalogName: String = fullName,
 ) {
     /** English Bibles show English book names (and UI, when following the version). */
     val isEnglish: Boolean get() = language == "English"
@@ -37,7 +40,8 @@ object BibleVersionRegistry {
         BibleVersion(
             id = "mbb12",
             shortName = "MBB12",
-            fullName = "Tagalog 2012 (Magandang Balita Biblia)",
+            fullName = "Magandang Balita Biblia",
+            catalogName = "Magandang Balita Biblia 2012",
             assetPath = "bibles/tagalog2012.xml",
             language = "Tagalog",
             copyright = "New Testament © 2012 Philippine Bible Society. Old Testament © 2005 Philippine Bible Society.",
@@ -45,7 +49,8 @@ object BibleVersionRegistry {
         BibleVersion(
             id = "asd",
             shortName = "ASD",
-            fullName = "Tagalog 2015 (Ang Salita ng Dios)",
+            fullName = "Ang Salita ng Dios",
+            catalogName = "Ang Salita ng Dios 2015",
             assetPath = "bibles/Tagalog2015Bible.xml",
             language = "Tagalog",
             copyright = "Ang Salita ng Dios (Tagalog Contemporary Bible). Copyright © 2009, 2011, 2014, 2015 by Biblica, Inc.",

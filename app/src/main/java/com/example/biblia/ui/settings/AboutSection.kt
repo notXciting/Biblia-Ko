@@ -115,7 +115,7 @@ private fun VersionInfo(version: BibleVersion, inUse: Boolean) {
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
             Text(
-                text = version.fullName,
+                text = version.catalogName,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = colors.onBackground,

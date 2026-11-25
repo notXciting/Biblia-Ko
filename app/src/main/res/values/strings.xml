@@ -147,7 +147,7 @@
     <string name="listen_stop">Ihinto ang pagbasa</string>
     <string name="listen_previous_verse">Nakaraang talata</string>
     <string name="listen_next_verse">Susunod na talata</string>
-    <string name="listen_reading">Binabasa nang malakas</string>
+    <string name="listen_reading">Binabasa ang</string>
     <string name="listen_paused">Naka-pause</string>
     <string name="listen_language_tagalog">Tagalog</string>
     <string name="listen_language_english">Ingles</string>
@@ -188,9 +188,6 @@
     <string name="settings_ui_scale_reset">Ibalik sa 100%</string>
     <string name="search_preparing">Inihahanda pa ang paghahanap</string>
     <string name="search_preparing_hint">Inaayos ang paghahanap para sa Bibliang ito pagkatapos ng update. Ilang saglit lang ito at kusang lalabas ang mga resulta.</string>
-    <string name="notes_title">Mga Tala</string>
-    <string name="notes_count">%1$d tala</string>
-    <string name="notes_search_hint">Hanapin sa mga tala</string>
     <string name="notes_sort_recent">Pinakabago</string>
     <string name="notes_sort_bible">Ayos ng Biblia</string>
     <string name="notes_empty">Wala ka pang tala</string>
@@ -232,4 +229,25 @@
     <string name="bibles_unload_title">Alisin ang %1$s?</string>
     <string name="bibles_unload_body">Mababakante ang ~%1$d MB. Maaari mo itong i-load muli anumang oras. Hindi maaapektuhan ang iyong mga marka at tala.</string>
     <string name="compare_add_version">Magdagdag ng bersyon</string>
+    <string name="backup_import_contents_no_settings">Laman: %1$d marka at %2$d tala.</string>
+    <string name="backup_import_merge_note_no_settings">Idadagdag ang mga ito sa kasalukuyang data; walang mabubura.</string>
+    <string name="backup_imported_no_settings">Na-import: %1$d bagong marka, %2$d bagong tala.</string>
+    <string name="study_title">Aking Pag-aaral</string>
+    <string name="study_tab_notes">Mga Tala (%1$d)</string>
+    <string name="study_tab_highlights">Mga Marka (%1$d)</string>
+    <string name="study_search_hint">Hanapin sa tala at marka</string>
+    <string name="highlights_empty">Wala ka pang marka</string>
+    <string name="highlights_empty_hint">Habang nagbabasa, pumili ng talata at pindutin ang isang kulay para markahan ito.</string>
+    <string name="highlights_none_found">Walang tumugmang marka</string>
+    <string name="highlight_add_note">Magdagdag ng tala</string>
+    <string name="highlight_change_color">Palitan ang kulay</string>
+    <string name="cd_more_options">Higit pang opsyon</string>
+    <string name="settings_bar_size">Laki ng mga bar</string>
+    <string name="settings_bar_size_hint">Ang itaas at ibabang bar habang nagbabasa. Sa Siksik, mga icon lang ang nasa ibaba.</string>
+    <string name="bar_size_compact">Siksik</string>
+    <string name="bar_size_normal">Normal</string>
+    <string name="bar_size_large">Malaki</string>
+    <string name="theme_paper">Papel</string>
+    <string name="settings_paper_grain">Tekstura ng papel</string>
+    <string name="settings_paper_grain_hint">Banayad na butil ng papel sa pahina ng pagbabasa.</string>
 </resources>

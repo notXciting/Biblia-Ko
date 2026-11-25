@@ -1,15 +1,11 @@
 package com.example.biblia.ui.reader
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.text.InlineTextContent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.EditNote
-import androidx.compose.material3.Icon
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.Placeholder
-import androidx.compose.ui.text.PlaceholderVerticalAlign
-import androidx.compose.ui.unit.em
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.graphics.vector.VectorPainter
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -65,11 +61,25 @@ internal suspend fun scrollToSpokenVerse(
     }
 }
 
-/** The note icon drawn inline after a verse that has a note (tap opens it). */
-internal fun noteInlineContent(accent: Color): Map<String, InlineTextContent> = mapOf(
-    NOTE_MARKER_ID to InlineTextContent(
-        Placeholder(width = 1.1.em, height = 1.em, placeholderVerticalAlign = PlaceholderVerticalAlign.TextCenter),
-    ) {
-        Icon(Icons.Outlined.EditNote, contentDescription = null, tint = accent, modifier = Modifier.fillMaxSize())
-    },
-)
+/**
+ * Draws the note icon over each marker glyph, at the glyph's final position
+ * in the laid-out text (so justification or line breaks can't misplace it).
+ */
+internal fun Modifier.drawNoteMarkers(
+    flow: ChapterFlow,
+    layout: () -> TextLayoutResult?,
+    painter: VectorPainter,
+    tint: Color,
+): Modifier = drawWithContent {
+    drawContent()
+    val l = layout() ?: return@drawWithContent
+    val filter = ColorFilter.tint(tint)
+    for ((range, _) in flow.markers) {
+        if (range.first >= l.layoutInput.text.length) continue
+        val box = l.getBoundingBox(range.first)
+        val side = minOf(box.width, box.height) * 0.9f
+        translate(left = box.left + (box.width - side) / 2, top = box.top + (box.height - side) / 2) {
+            with(painter) { draw(Size(side, side), colorFilter = filter) }
+        }
+    }
+}

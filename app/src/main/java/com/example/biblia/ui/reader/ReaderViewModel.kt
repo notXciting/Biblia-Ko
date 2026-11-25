@@ -218,9 +218,6 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
     fun openVersionSheet() { sheetVisible = true }
     fun closeVersionSheet() { sheetVisible = false }
 
-    fun isLastChapterOfBook(b: Int, c: Int): Boolean =
-        chapterCounts.isNotEmpty() && chapterCounts[b] == c
-
     /** Cached chapter load (shared LRU); called from pager pages. */
     suspend fun loadChapter(v: String, b: Int, c: Int): ChapterContent? =
         chapterCache.get(v, b, c)
@@ -279,6 +276,18 @@ class ReaderViewModel(private val container: AppContainer) : ViewModel() {
         val start = selectedVerses.minOrNull() ?: topVerse.takeIf { it > 0 } ?: 1
         selectedVerses = emptySet()
         container.tts.play(version, book, chapter, start)
+    }
+
+    /**
+     * Reading aloud paused or stopped on [verse]: the title and the reading
+     * position (also the anchor for a version switch) move there. Only when
+     * the reader shows that chapter, so browsing elsewhere is never yanked back.
+     */
+    fun syncToListen(b: Int, c: Int, verse: Int) {
+        if (b != book || c != chapter || verse <= 0) return
+        focusedVerse = verse
+        topVerse = verse
+        persistPosition()
     }
 
     /** A jump while reading aloud continues reading at the new place (paused: stop). */

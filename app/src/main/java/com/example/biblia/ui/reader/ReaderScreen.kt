@@ -3,11 +3,6 @@ package com.example.biblia.ui.reader
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,25 +13,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -51,6 +40,7 @@ import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.catalog.BookCatalog
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.model.BookInfo
 import com.example.biblia.domain.reference.ReferenceFormatter
 import com.example.biblia.domain.tts.TtsController
 import com.example.biblia.domain.tts.TtsState
@@ -89,14 +79,13 @@ fun ReaderScreen(
 
     Column(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         ReaderTopBar(
-            locationLabel = locationLabel(vm),
+            locationLabel = locationLabel(vm) { it.displayName },
+            shortLocationLabel = locationLabel(vm) { it.displayShortName },
             versionShortName = vm.version.shortName,
             onSettingsClick = onOpenSettings,
             onLocationClick = onOpenSelection,
             onVersionClick = { vm.openVersionSheet() },
-            listening = tts.isActive,
-            onNotesClick = onOpenNotes,
-            onListenClick = { if (tts.isActive) container.tts.stop() else vm.startListening() },
+            barSize = settings.barSize,
         )
         if (vm.ready) {
             key(vm.jumpId) {
@@ -104,7 +93,12 @@ fun ReaderScreen(
                     initialPage = vm.flatIndexOf(vm.book, vm.chapter),
                     pageCount = { vm.totalChapters },
                 )
-                ReaderBody(vm, settings, pagerState, tts, container.tts, Modifier.weight(1f))
+                ReaderBody(
+                    vm, settings, pagerState, tts, container.tts,
+                    onStudy = onOpenNotes,
+                    onListen = { vm.startListening() },
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
@@ -151,6 +145,8 @@ private fun ReaderBody(
     pagerState: PagerState,
     tts: TtsState,
     listen: TtsController,
+    onStudy: () -> Unit,
+    onListen: () -> Unit,
     modifier: Modifier,
 ) {
     val context = LocalContext.current
@@ -183,8 +179,26 @@ private fun ReaderBody(
         if (pagerState.currentPage != target) pagerState.animateScrollToPage(target)
     }
     val listening = tts.isActive && tts.versionId == vm.version.id
+    // Where reading aloud is; when it pauses or stops (stop clears TtsState),
+    // the reader's title and position move to that verse.
+    val lastSpoken = remember { mutableStateOf<Triple<Int, Int, Int>?>(null) }
+    LaunchedEffect(tts.status, tts.book, tts.chapter, tts.verse) {
+        val here = Triple(tts.book, tts.chapter, tts.verse).takeIf { tts.verse > 0 && tts.versionId == vm.version.id }
+        when (tts.status) {
+            TtsStatus.PLAYING -> if (here != null) lastSpoken.value = here
+            // Paused (prev/next while paused move it too): follow the paused verse.
+            TtsStatus.PAUSED -> here?.let { (b, c, v) -> lastSpoken.value = here; vm.syncToListen(b, c, v) }
+            TtsStatus.IDLE -> {
+                lastSpoken.value?.let { (b, c, v) -> vm.syncToListen(b, c, v) }
+                lastSpoken.value = null
+            }
+        }
+    }
+    // Bottom bar: hides while reading downward, back on scroll up or a new chapter.
+    val (hideOnScroll, barShown) = rememberHideOnScroll()
+    LaunchedEffect(pagerState.currentPage) { barShown.value = true }
 
-    Box(modifier.fillMaxSize()) {
+    Box(modifier.fillMaxSize().nestedScroll(hideOnScroll)) {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
@@ -204,31 +218,32 @@ private fun ReaderBody(
                 speakingVerse = if (listening && tts.book == b && tts.chapter == c) tts.verse else 0,
             )
         }
-        val showArrows = vm.selectedVerses.isEmpty() && !listening
-        PageArrow(
-            visible = showArrows && pagerState.currentPage > 0,
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-            description = stringResource(R.string.action_previous_chapter),
-            onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
-            modifier = Modifier.align(Alignment.BottomStart),
-        )
-        PageArrow(
-            visible = showArrows && pagerState.currentPage < vm.totalChapters - 1,
-            icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-            description = stringResource(R.string.action_next_chapter),
-            onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
-            modifier = Modifier.align(Alignment.BottomEnd),
+        // The verse panel and the Listen player take the bar's place.
+        ReaderBottomBar(
+            visible = barShown.value && vm.selectedVerses.isEmpty() && !listening,
+            canGoBack = pagerState.currentPage > 0,
+            canGoForward = pagerState.currentPage < vm.totalChapters - 1,
+            onPrevious = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
+            onNext = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
+            onStudy = onStudy,
+            onListen = onListen,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            barSize = settings.barSize,
         )
         ListenBar(
             visible = listening && vm.selectedVerses.isEmpty(),
             reference = if (tts.verse > 0) {
                 ReferenceFormatter.format(BookCatalog.book(tts.book).displayName, tts.chapter, (tts.verse..tts.verseEnd).toList())
             } else "",
+            shortReference = if (tts.verse > 0) {
+                ReferenceFormatter.format(BookCatalog.book(tts.book).displayShortName, tts.chapter, (tts.verse..tts.verseEnd).toList())
+            } else "",
             playing = tts.status == TtsStatus.PLAYING,
             onPlayPause = { if (tts.status == TtsStatus.PLAYING) listen.pause() else listen.resume() },
             onPrevious = { listen.previous() },
             onNext = { listen.next() },
             onStop = { listen.stop() },
+            barSize = settings.barSize,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .navigationBarsPadding()
@@ -277,41 +292,9 @@ private fun ReaderBody(
     }
 }
 
-/** Small, quiet circular arrow floating at a bottom corner. */
 @Composable
-private fun PageArrow(
-    visible: Boolean,
-    icon: ImageVector,
-    description: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn() + scaleIn(initialScale = 0.8f),
-        exit = fadeOut() + scaleOut(targetScale = 0.8f),
-        modifier = modifier
-            .navigationBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 20.dp),
-    ) {
-        Surface(
-            onClick = onClick,
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            shadowElevation = 3.dp,
-            modifier = Modifier.size(44.dp),
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(imageVector = icon, contentDescription = description)
-            }
-        }
-    }
-}
-
-@Composable
-private fun locationLabel(vm: ReaderViewModel): String {
-    val name = BookCatalog.book(vm.book).displayName
+private fun locationLabel(vm: ReaderViewModel, bookName: (BookInfo) -> String): String {
+    val name = bookName(BookCatalog.book(vm.book))
     val end = vm.verseEnd(vm.focusedVerse)
     return if (vm.focusedVerse > 0 && end > vm.focusedVerse) {
         ReferenceFormatter.format(name, vm.chapter, (vm.focusedVerse..end).toList()) // combined "1-2"

@@ -33,6 +33,7 @@ import com.example.biblia.R
 import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.model.ThemeMode
 
 /**
  * Settings: theme tiles, accent swatches, font size (live preview) and line
@@ -89,6 +90,8 @@ fun SettingsScreen(
             )
             Spacer(Modifier.height(8.dp))
             UiScaleSection(current = settings.uiScale, onChange = { vm.setUiScale(it) })
+            Spacer(Modifier.height(8.dp))
+            BarSizeSection(current = settings.barSize, onSelect = { vm.setBarSize(it) })
             Spacer(Modifier.height(16.dp))
             AppIconSection(
                 current = settings.appIcon,
@@ -107,6 +110,9 @@ fun SettingsScreen(
                     vm.setThemeMode(mode)
                 },
             )
+            if (settings.themeMode == ThemeMode.PAPER) {
+                PaperGrainRow(checked = settings.paperGrain, onChange = { vm.setPaperGrain(it) })
+            }
             Spacer(Modifier.height(16.dp))
             SectionTitle(stringResource(R.string.settings_accent_color))
             AccentSwatches(

@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v3.1.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v4.0.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -27,7 +27,8 @@ Biblia Ko works **completely offline**. It needs no account and no internet, and
 ### Reading
 - **Eleven Bible versions** in Tagalog and English, switchable at any time. The reader **stays on the verse you are reading** when you switch.
 - **Load only the Bibles you use.** The version picker lists your loaded Bibles for one-tap switching; **Manage Bibles** shows all eleven with their size, so you can load or remove any of them (about 8 MB each). Highlights and notes are never affected.
-- **Swipe between chapters**, or use the page arrows. Your place is remembered between sessions.
+- **Swipe between chapters**, or use the reading bar at the bottom (previous/next chapter, My Study, Listen), which slides away while you read. Choose compact, normal or large bars in Settings. Your place is remembered between sessions.
+- **The book and verse always fit** in the top bar: on small screens or large text sizes it switches to the short book name (e.g. *1 Tes 4:16*).
 - **Combined verses are labelled as ranges.** Where a translation merges verses (common in the Tagalog versions), the reader shows e.g. Ruth 1:**1-2**. References, highlights, Compare and Listen all use the full range.
 - **Two verse layouts:** a flowing *Paragraph* or *Verse by verse*, each verse on its own line.
 - Serif reading font, adjustable **font size** and **line spacing**, with live previews in Settings.
@@ -53,10 +54,10 @@ Tap any verse to open the verse panel:
 - **Compare** the selected verses side by side in every installed version.
 - **Cross-references:** the verse panel lists up to 10 related passages for the selected verse, with their text in the Bible you are reading. Tap one to jump to it. Works offline in every version, including verses that a translation combines (e.g. Ruth 1:1-2).
 - **Notes:** write a personal note, prayer or reflection on one or more verses. A small note icon marks noted verses in the reader; tap it to read or edit the note. Like highlights, notes show in every translation.
-- **All your notes in one place:** the notebook button in the reader opens a searchable list of your notes, sorted by newest or in Bible order. Open a note to edit it, share it, or jump straight to its verse.
+- **My Study (Aking Pag-aaral):** one place for everything you've marked. The **Notes** tab lists your notes (edit, share, jump to the verse). The **Highlights** tab lists your highlighted passages, with consecutive verses grouped and shown in the Bible you're reading. You can filter them by colour, change their colour, add a note, share them or remove them. Search and sort (newest or Bible order) work in both tabs.
 
 ### Personalisation
-- **Seven themes:** System, Light, Sepia, Sage, Dark, Slate, and Midnight (true black for OLED screens).
+- **Eight themes:** System, Light, Sepia, **Paper** (a printed-Bible page: white paper on a desk, red verse numbers, justified text, optional paper grain), Sage, Dark, Slate, and Midnight (true black for OLED screens).
 - **Ten accent colours.** Each has a tone tuned separately for light and dark themes, and every combination is unit-tested for WCAG text contrast, including on top of highlights.
 - **App language:** Tagalog, English, or *Follow the Bible*, which uses Tagalog for Tagalog versions and English for English ones. Book names follow the selected Bible's language.
 - **App size:** make the whole app bigger or smaller (80%–130%), independent of the phone's display-size setting.
@@ -74,7 +75,7 @@ Tap any verse to open the verse panel:
 
 ## Download & install
 
-1. Download **`BibliaKo-v3.1.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v4.0.0.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
 3. On first launch the app prepares the default Bible (a few seconds). Load more Bibles any time from the version picker → **Manage Bibles**.
 
@@ -133,7 +134,7 @@ sdk.dir=C\:\\path\\to\\Android\\Sdk
 ```bash
 ./gradlew assembleDebug          # debug APK  -> app/build/outputs/apk/debug/
 ./gradlew assembleRelease        # release APK -> app/build/outputs/apk/release/
-./gradlew :app:testDebugUnitTest # unit tests (100)
+./gradlew :app:testDebugUnitTest # unit tests (106)
 ```
 
 On Windows, use `gradlew.bat`. To run a single test class:

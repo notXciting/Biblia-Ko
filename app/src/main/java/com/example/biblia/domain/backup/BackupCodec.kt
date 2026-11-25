@@ -72,6 +72,8 @@ object BackupCodec {
         put("verseLayout", s.verseLayout.name); put("viewMode", s.viewMode.name)
         put("searchScope", s.searchScope.name); put("uiScale", s.uiScale.toDouble())
         put("noteSort", s.noteSort.name)
+        put("showCrossRefs", s.showCrossRefs); put("crossRefFont", s.crossRefFont.name)
+        put("barSize", s.barSize.name); put("paperGrain", s.paperGrain)
         put("ttsRate", s.tts.rate.toDouble()); put("ttsPitch", s.tts.pitch.toDouble())
         put("ttsSpeakVerseNumbers", s.tts.speakVerseNumbers)
         put("ttsVoices", JSONObject(s.tts.voices))
@@ -93,6 +95,10 @@ object BackupCodec {
             searchScope = enumOf(o, "searchScope", d.searchScope),
             uiScale = UiScale.clamp(o.optDouble("uiScale", d.uiScale.toDouble()).toFloat()),
             noteSort = enumOf(o, "noteSort", d.noteSort),
+            showCrossRefs = o.optBoolean("showCrossRefs", d.showCrossRefs),
+            crossRefFont = enumOf(o, "crossRefFont", d.crossRefFont),
+            barSize = enumOf(o, "barSize", d.barSize),
+            paperGrain = o.optBoolean("paperGrain", d.paperGrain),
             tts = TtsPrefs(
                 rate = o.optDouble("ttsRate", 1.0).toFloat().coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = o.optDouble("ttsPitch", 1.0).toFloat().coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),

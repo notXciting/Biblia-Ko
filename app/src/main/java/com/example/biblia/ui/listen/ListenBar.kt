@@ -35,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.biblia.R
+import com.example.biblia.domain.model.BarSize
+import com.example.biblia.ui.components.FittingText
 
 /**
  * Floating "Listen" transport: the verse being read, previous/next verse,
@@ -44,13 +46,23 @@ import com.example.biblia.R
 fun ListenBar(
     visible: Boolean,
     reference: String,
+    /** Same reference with the short book name, used when [reference] doesn't fit. */
+    shortReference: String,
     playing: Boolean,
     onPlayPause: () -> Unit,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onStop: () -> Unit,
     modifier: Modifier = Modifier,
+    barSize: BarSize = BarSize.NORMAL,
 ) {
+    val vertical = when (barSize) { BarSize.COMPACT -> 2.dp; BarSize.NORMAL -> 8.dp; BarSize.LARGE -> 12.dp }
+    val playSize = when (barSize) { BarSize.COMPACT -> 40.dp; BarSize.NORMAL -> 48.dp; BarSize.LARGE -> 56.dp }
+    val referenceStyle = when (barSize) {
+        BarSize.COMPACT -> MaterialTheme.typography.labelLarge
+        BarSize.NORMAL -> MaterialTheme.typography.titleSmall
+        BarSize.LARGE -> MaterialTheme.typography.titleMedium
+    }
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(spring(stiffness = Spring.StiffnessMediumLow)) { it } + fadeIn(),
@@ -67,7 +79,7 @@ fun ListenBar(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(start = 20.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+                modifier = Modifier.padding(start = 20.dp, end = 6.dp, top = vertical, bottom = vertical),
             ) {
                 Column(Modifier.weight(1f)) {
                     Text(
@@ -76,18 +88,16 @@ fun ListenBar(
                         color = MaterialTheme.colorScheme.primary,
                         maxLines = 1,
                     )
-                    Text(
-                        text = reference,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                    FittingText(
+                        full = reference,
+                        short = shortReference,
+                        style = referenceStyle.copy(fontWeight = FontWeight.SemiBold),
                     )
                 }
                 IconButton(onClick = onPrevious) {
                     Icon(Icons.Rounded.SkipPrevious, stringResource(R.string.listen_previous_verse))
                 }
-                FilledIconButton(onClick = onPlayPause, modifier = Modifier.size(48.dp)) {
+                FilledIconButton(onClick = onPlayPause, modifier = Modifier.size(playSize)) {
                     Icon(
                         imageVector = if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                         contentDescription = stringResource(if (playing) R.string.listen_pause else R.string.listen_play),

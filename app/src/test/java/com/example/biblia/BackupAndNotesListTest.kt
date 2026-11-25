@@ -8,6 +8,8 @@ import com.example.biblia.domain.backup.HighlightBackup
 import com.example.biblia.domain.backup.NoteBackup
 import com.example.biblia.domain.model.AccentColor
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.domain.model.BarSize
+import com.example.biblia.domain.model.CrossRefFont
 import com.example.biblia.domain.model.NoteSort
 import com.example.biblia.domain.model.NoteVerses
 import com.example.biblia.domain.model.ThemeMode
@@ -23,7 +25,7 @@ class BackupAndNotesListTest {
 
     private val settings = AppSettings(
         themeMode = ThemeMode.MIDNIGHT, accent = AccentColor.TEAL, fontSizeSp = 22f, uiScale = 1.15f,
-        noteSort = NoteSort.BIBLE, tts = TtsPrefs(rate = 1.25f, voices = mapOf("English" to "en-us-x-iol-local")),
+        noteSort = NoteSort.BIBLE, showCrossRefs = false, crossRefFont = CrossRefFont.SANS, barSize = BarSize.COMPACT, paperGrain = true, tts = TtsPrefs(rate = 1.25f, voices = mapOf("English" to "en-us-x-iol-local")),
     )
     private val backup = BackupData(
         exportedAt = 1_764_000_000_000, appVersion = "2.4.0", settings = settings,
@@ -42,6 +44,10 @@ class BackupAndNotesListTest {
         assertEquals(22f, s.fontSizeSp)
         assertEquals(1.15f, s.uiScale)
         assertEquals(NoteSort.BIBLE, s.noteSort)
+        assertEquals(false, s.showCrossRefs)
+        assertEquals(CrossRefFont.SANS, s.crossRefFont)
+        assertEquals(BarSize.COMPACT, s.barSize)
+        assertEquals(true, s.paperGrain)
         assertEquals(1.25f, s.tts.rate)
         assertEquals(mapOf("English" to "en-us-x-iol-local"), s.tts.voices)
         assertEquals("2.4.0", decoded.appVersion)
@@ -63,6 +69,10 @@ class BackupAndNotesListTest {
             "notes":[{"book":1,"chapter":1,"verses":[],"text":"x"},{"book":1,"chapter":1,"verses":[2,1],"text":"  ok  "}]}"""
         val d = BackupCodec.decode(raw)
         assertEquals(AppSettings().themeMode, d.settings!!.themeMode) // unknown enum -> default
+        // Files from before cross-references keep the defaults (on, serif italic).
+        assertEquals(true, d.settings!!.showCrossRefs)
+        assertEquals(CrossRefFont.SERIF_ITALIC, d.settings!!.crossRefFont)
+        assertEquals(BarSize.NORMAL, d.settings!!.barSize)
         assertEquals(32f, d.settings!!.fontSizeSp)
         assertEquals(1.3f, d.settings!!.uiScale)
         assertEquals(1, d.highlights.size) // book 99 dropped

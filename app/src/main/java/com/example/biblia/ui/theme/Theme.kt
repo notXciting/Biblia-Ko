@@ -6,7 +6,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import com.example.biblia.domain.model.AccentColor
@@ -27,6 +29,10 @@ class ThemePalette(
     val containerHighest: Long,
     val outline: Long,
     val outlineVariant: Long,
+    /** Paper only: the "desk" around the reader page (null = the page fills the screen). */
+    val desk: Long? = null,
+    /** Paper only: printed-Bible red for verse numbers (null = the accent colour). */
+    val verseNumber: Long? = null,
 )
 
 /** Theme palettes, also used by the Settings theme previews. */
@@ -38,6 +44,17 @@ object ThemePalettes {
     val SEPIA = ThemePalette(
         false, 0xFFF5ECDA, 0xFF433724, 0xFFEBDFC6, 0xFF6E5E42,
         0xFFFAF3E6, 0xFFF1E7D2, 0xFFEDE2CB, 0xFFE9DCC3, 0xFFE3D5BA, 0xFFB9A784, 0xFFE0D2B6,
+    )
+    /**
+     * A printed Bible page: neutral warm-white paper (not Sepia's amber), near-black
+     * blue-gray ink (not Sepia's brown), a light gray-beige desk around the page and
+     * muted red verse numbers. Contrast is checked in ThemeContrastTest.
+     */
+    val PAPER = ThemePalette(
+        false, 0xFFFBF9F4, 0xFF1E1E22, 0xFFF0EEE8, 0xFF55565C,
+        0xFFFFFFFF, 0xFFF6F4EE, 0xFFF2F0EA, 0xFFEDEBE5, 0xFFE7E5DF, 0xFFB9B7B0, 0xFFE2DFD8,
+        desk = 0xFFE6E3DC,
+        verseNumber = 0xFFA3332B,
     )
     /** Soft green-gray paper: calm for long reading. */
     val SAGE = ThemePalette(
@@ -63,6 +80,7 @@ object ThemePalettes {
         ThemeMode.SYSTEM -> if (systemDark) DARK else LIGHT
         ThemeMode.LIGHT -> LIGHT
         ThemeMode.SEPIA -> SEPIA
+        ThemeMode.PAPER -> PAPER
         ThemeMode.SAGE -> SAGE
         ThemeMode.DARK -> DARK
         ThemeMode.SLATE -> SLATE
@@ -76,7 +94,14 @@ fun BibleTheme(settings: AppSettings, content: @Composable () -> Unit) {
     val systemDark = isSystemInDarkTheme()
     val palette = ThemePalettes.of(settings.themeMode, systemDark)
     val scheme = remember(palette, settings.accent) { buildScheme(palette, settings.accent) }
-    MaterialTheme(colorScheme = scheme, content = content)
+    val page = remember(palette, settings.paperGrain) {
+        palette.desk?.let { desk ->
+            PageStyle(Color(desk), Color(palette.verseNumber ?: palette.onBackground), settings.paperGrain)
+        }
+    }
+    CompositionLocalProvider(LocalPageStyle provides page) {
+        MaterialTheme(colorScheme = scheme, content = content)
+    }
 }
 
 /**
@@ -114,3 +139,11 @@ fun buildScheme(p: ThemePalette, accent: AccentColor): ColorScheme {
         outlineVariant = Color(p.outlineVariant),
     )
 }
+
+/**
+ * Printed-page look of the reader, provided only by themes with a desk colour
+ * (Paper). Null for every other theme, so they render exactly as before.
+ */
+class PageStyle(val desk: Color, val verseNumber: Color, val grain: Boolean)
+
+val LocalPageStyle = staticCompositionLocalOf<PageStyle?> { null }

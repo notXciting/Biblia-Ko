@@ -20,7 +20,7 @@ import com.example.biblia.BuildConfig
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
 import com.example.biblia.ui.bibles.ManageBiblesScreen
-import com.example.biblia.ui.notes.NotesScreen
+import com.example.biblia.ui.notes.StudyScreen
 import com.example.biblia.ui.reader.ReaderScreen
 import com.example.biblia.ui.selection.SelectionScreen
 import com.example.biblia.ui.settings.SettingsScreen
@@ -136,7 +136,7 @@ fun BibleNavHost(container: AppContainer, settings: AppSettings, modifier: Modif
                     fadeOut(tween(EXIT_MS))
             },
         ) {
-            NotesScreen(
+            StudyScreen(
                 container = container,
                 settings = settings,
                 onBack = { navController.popBackStack() },

@@ -37,6 +37,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -44,7 +45,9 @@ import androidx.compose.ui.unit.sp
 import com.example.biblia.domain.model.Verse
 import com.example.biblia.domain.model.VerseLayout
 import com.example.biblia.domain.model.VerseSpans
-import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.EditNote
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.example.biblia.perf.VersePerf
 
 internal class ChapterFlow(
@@ -75,15 +78,18 @@ internal fun buildChapterFlow(
     else buildParagraph(verses, accent, fontSize, ends, noted)
 }
 
-internal const val NOTE_MARKER_ID = "note"
-
 /** Inline note icon after a verse (outside the verse's own range). */
 private fun AnnotatedString.Builder.appendNoteMarker(verse: Int, markers: MutableList<Pair<IntRange, Int>>) {
-    append(' ')
+    append(NO_BREAK_SPACE) // keeps the icon on the line of the verse's last word
     val start = length
-    appendInlineContent(NOTE_MARKER_ID, "✎")
+    withStyle(SpanStyle(color = Color.Transparent)) { append(NOTE_MARKER_GLYPH) }
     markers.add((start until length) to verse)
 }
+
+private const val NO_BREAK_SPACE = '\u00A0'
+
+/** Invisible stand-in whose box the note icon is drawn into (a wide glyph every serif font has). */
+private const val NOTE_MARKER_GLYPH = "M"
 
 private const val EN_SPACE = ' '
 private const val ZERO_WIDTH_SPACE = '​'
@@ -178,6 +184,14 @@ fun ChapterFlowText(
     lineHeightMultiplier: Float,
     accent: Color,
     layout: VerseLayout = VerseLayout.PARAGRAPH,
+    /** Verse-number colour (Paper: printed-Bible red); the accent otherwise. */
+    numberColor: Color = accent,
+    /**
+     * Paper theme: balanced line breaks for an even, printed right edge. Not
+     * TextAlign.Justify: Compose's reported glyph positions ignore the stretched
+     * spaces, which misplaced the note icon, the jump pulse and selection edges.
+     */
+    balanced: Boolean = false,
     selectedVerses: Set<Int>,
     highlights: Map<Int, Color> = emptyMap(),
     pulseVerse: Int,
@@ -195,8 +209,8 @@ fun ChapterFlowText(
     // Scroll target: a highlighted jump verse, else a silent anchor (version switch).
     val scrollTarget = if (pulseVerse > 0) pulseVerse else anchorVerse
     val reportTop by rememberUpdatedState(onTopVerse)
-    val flow = remember(verses, accent, fontSize, layout, notedVerses) {
-        buildChapterFlow(verses, accent, fontSize, layout, notedVerses)
+    val flow = remember(verses, numberColor, fontSize, layout, notedVerses) {
+        buildChapterFlow(verses, numberColor, fontSize, layout, notedVerses)
     }
     val pulse = remember { Animatable(0f) }
     LaunchedEffect(pulseVerse) {
@@ -207,6 +221,7 @@ fun ChapterFlowText(
             onPulseFinished()
         }
     }
+    val notePainter = rememberVectorPainter(Icons.Outlined.EditNote)
     val selectionColor = accent.copy(alpha = 0.16f)
     val speakingColor = accent.copy(alpha = 0.14f)
     var layout by remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -272,14 +287,15 @@ fun ChapterFlowText(
             fontFamily = FontFamily.Serif,
             fontSize = fontSize,
             lineHeight = fontSize * lineHeightMultiplier,
+            lineBreak = if (balanced) LineBreak.Paragraph else LineBreak.Simple,
             color = MaterialTheme.colorScheme.onBackground,
         ),
         onTextLayout = { layout = it },
-        inlineContent = noteInlineContent(accent),
         modifier = modifier
             .fillMaxWidth()
             .onPlaced { textTop = it.positionInParent().y }
             .graphicsLayer { alpha = if (positioned) 1f else 0f }
+            .drawNoteMarkers(flow, { layout }, notePainter, accent)
             .drawBehind {
                 val l = layout ?: return@drawBehind
                 val spoken = flow.indexOfVerse(speakingVerse)

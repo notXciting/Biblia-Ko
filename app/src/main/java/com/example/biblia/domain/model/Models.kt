@@ -29,6 +29,24 @@ data class BookInfo(
 
     /** The name in the other language (shown as a secondary hint). */
     val alternateName: String get() = if (BookNameLanguage.english) tagalogName else englishName
+
+    /** Short form in the current Bible's language ("1 Tes" / "1 Thess"), for tight spaces. */
+    val displayShortName: String get() = if (BookNameLanguage.english) EnglishBookShortNames.of(number) else abbreviation
+}
+
+/** Common English book abbreviations (the catalog's [BookInfo.abbreviation] is Tagalog). */
+object EnglishBookShortNames {
+    private val names = listOf(
+        "Gen", "Exod", "Lev", "Num", "Deut", "Josh", "Judg", "Ruth", "1 Sam", "2 Sam",
+        "1 Kgs", "2 Kgs", "1 Chr", "2 Chr", "Ezra", "Neh", "Esth", "Job", "Ps", "Prov",
+        "Eccl", "Song", "Isa", "Jer", "Lam", "Ezek", "Dan", "Hos", "Joel", "Amos",
+        "Obad", "Jonah", "Mic", "Nah", "Hab", "Zeph", "Hag", "Zech", "Mal",
+        "Matt", "Mark", "Luke", "John", "Acts", "Rom", "1 Cor", "2 Cor", "Gal", "Eph",
+        "Phil", "Col", "1 Thess", "2 Thess", "1 Tim", "2 Tim", "Titus", "Phlm", "Heb", "Jas",
+        "1 Pet", "2 Pet", "1 John", "2 John", "3 John", "Jude", "Rev",
+    )
+
+    fun of(book: Int): String = names[(book - 1).coerceIn(0, names.lastIndex)]
 }
 
 enum class Testament { OLD, NEW }
@@ -141,6 +159,8 @@ enum class ThemeMode(private val dark: Boolean?) {
     SYSTEM(null),
     LIGHT(false),
     SEPIA(false),
+    /** Printed-Bible page: near-white paper, blue-black ink, red verse numbers. */
+    PAPER(false),
     SAGE(false),
     DARK(true),
     SLATE(true),
@@ -229,7 +249,18 @@ data class AppSettings(
     /** Cross-references in the verse panel (Settings > "Mga kaugnay na talata"). */
     val showCrossRefs: Boolean = true,
     val crossRefFont: CrossRefFont = CrossRefFont.SERIF_ITALIC,
+    /** Faint paper grain on the reader page (Paper theme only; off by default). */
+    val paperGrain: Boolean = false,
+    /** Height of the reader's top and bottom bars (Settings > "Laki ng mga bar"). */
+    val barSize: BarSize = BarSize.NORMAL,
 )
+
+/** Reader bar size: compact hides the bottom bar labels; large adds room and bigger icons. */
+enum class BarSize(val topHeightDp: Int, val bottomHeightDp: Int) {
+    COMPACT(48, 52),
+    NORMAL(56, 64),
+    LARGE(64, 76),
+}
 
 /** How cross-reference text is set in the verse panel. */
 enum class CrossRefFont { SERIF_ITALIC, SANS }
