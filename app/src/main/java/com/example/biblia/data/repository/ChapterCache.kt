@@ -30,6 +30,11 @@ class ChapterCache(private val repo: BibleRepository) {
         return content
     }
 
+    /** Drops every cached chapter of [versionId] (after it is unloaded). */
+    fun invalidate(versionId: String) {
+        synchronized(cache) { cache.keys.removeAll { it.startsWith("$versionId:") } }
+    }
+
     /** Fire-and-forget preload on the given background scope. */
     fun preload(scope: CoroutineScope, versionId: String, book: Int, chapter: Int) {
         if (peek(versionId, book, chapter) != null) return

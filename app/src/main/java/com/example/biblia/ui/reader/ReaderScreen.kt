@@ -72,6 +72,7 @@ fun ReaderScreen(
     onOpenSelection: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
     onOpenNotes: () -> Unit = {},
+    onOpenBibles: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val vm: ReaderViewModel = viewModel(
@@ -79,6 +80,7 @@ fun ReaderScreen(
     )
     val importStates by container.importer.states.collectAsStateWithLifecycle()
     val tts by container.tts.state.collectAsStateWithLifecycle()
+    val loadedVersions by container.versionLibrary.loaded.collectAsStateWithLifecycle(initialValue = emptySet())
     // Cross-references follow the selection; refreshed once the background import finishes.
     val crossRefsReady by container.crossRefImporter.ready.collectAsStateWithLifecycle()
     LaunchedEffect(vm.selectedVerses, vm.version.id, settings.showCrossRefs, crossRefsReady) {
@@ -107,7 +109,15 @@ fun ReaderScreen(
         }
     }
     vm.actions.compare?.let { state ->
-        CompareSheet(state = state, currentVersionId = vm.version.id, onDismiss = { vm.actions.closeCompare() })
+        CompareSheet(
+            state = state,
+            currentVersionId = vm.version.id,
+            onDismiss = { vm.actions.closeCompare() },
+            onAddVersion = {
+                vm.actions.closeCompare()
+                onOpenBibles()
+            },
+        )
     }
     vm.actions.noteEditor?.let { editor ->
         NoteSheet(
@@ -119,11 +129,17 @@ fun ReaderScreen(
     }
     if (vm.sheetVisible) {
         VersionBottomSheet(
-            versions = BibleVersionRegistry.all,
+            versions = BibleVersionRegistry.all.filter {
+                it.id in loadedVersions || it.id == vm.version.id || importStates[it.id]?.isRunning == true
+            },
             currentVersionId = vm.version.id,
             importStates = importStates,
             onSelect = { vm.selectVersion(it) },
             onDismiss = { vm.closeVersionSheet() },
+            onManage = {
+                vm.closeVersionSheet()
+                onOpenBibles()
+            },
         )
     }
 }

@@ -159,6 +159,14 @@ class SettingsRepository(private val context: Context) {
 
     suspend fun isImported(versionId: String): Boolean = isImportedFlow(versionId).first()
 
+    /** Ids of every registered version that is loaded (imported) on this phone. */
+    val loadedVersionIds: Flow<Set<String>> = context.settingsStore.data.map { p ->
+        BibleVersionRegistry.all.filter { p[Keys.imported(it.id)] == true }.mapTo(LinkedHashSet()) { it.id }
+    }
+
+    /** After an unload: the version must be imported again before it can be read. */
+    suspend fun unmarkImported(versionId: String) = edit { it.remove(Keys.imported(versionId)) }
+
     private companion object {
         val TTS_LANGUAGES = BibleVersionRegistry.all.map { it.language }.distinct()
     }

@@ -38,6 +38,9 @@ interface BibleDao {
     @Query("SELECT id, text FROM verses WHERE versionId = :versionId ORDER BY id")
     fun verseTexts(versionId: String): List<VerseTextRow>
 
+    @Query("DELETE FROM version_meta WHERE versionId = :versionId")
+    fun deleteVersionMeta(versionId: String)
+
     @Query("DELETE FROM verses WHERE versionId = :versionId")
     fun deleteVersesForVersion(versionId: String)
 

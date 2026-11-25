@@ -91,6 +91,14 @@ object BibleVersionRegistry {
             copyright = "King James Version. Public domain.",
         ),
         BibleVersion(
+            id = "nasb",
+            shortName = "NASB",
+            fullName = "New American Standard Bible (1995)",
+            assetPath = "bibles/EnglishNASBBible.xml",
+            language = "English",
+            copyright = "New American Standard Bible®. Copyright © 1960, 1962, 1963, 1968, 1971, 1972, 1973, 1975, 1977, 1995 by The Lockman Foundation.",
+        ),
+        BibleVersion(
             id = "niv",
             shortName = "NIV",
             fullName = "New International Version",

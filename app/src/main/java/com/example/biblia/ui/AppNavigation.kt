@@ -19,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.biblia.BuildConfig
 import com.example.biblia.di.AppContainer
 import com.example.biblia.domain.model.AppSettings
+import com.example.biblia.ui.bibles.ManageBiblesScreen
 import com.example.biblia.ui.notes.NotesScreen
 import com.example.biblia.ui.reader.ReaderScreen
 import com.example.biblia.ui.selection.SelectionScreen
@@ -26,12 +27,13 @@ import com.example.biblia.ui.settings.SettingsScreen
 
 private const val TAG = "VERSE_NAV"
 
-/** Routes: reader <-> selection, reader -> settings, reader -> notes. */
+/** Routes: reader <-> selection, reader -> settings / notes / bibles. */
 object Routes {
     const val READER = "reader"
     const val SELECTION = "selection"
     const val SETTINGS = "settings"
     const val NOTES = "notes"
+    const val BIBLES = "bibles"
 }
 
 /** Material "emphasized decelerate" / "accelerate" curves. */
@@ -65,6 +67,7 @@ fun BibleNavHost(container: AppContainer, settings: AppSettings, modifier: Modif
                 onOpenSelection = { navController.navigate(Routes.SELECTION) },
                 onOpenSettings = { navController.navigate(Routes.SETTINGS) },
                 onOpenNotes = { navController.navigate(Routes.NOTES) },
+                onOpenBibles = { navController.navigate(Routes.BIBLES) },
             )
         }
         composable(
@@ -108,6 +111,19 @@ fun BibleNavHost(container: AppContainer, settings: AppSettings, modifier: Modif
                 settings = settings,
                 onBack = { navController.popBackStack() },
             )
+        }
+        composable(
+            Routes.BIBLES,
+            enterTransition = {
+                slideInHorizontally(tween(ENTER_MS, easing = Decelerate)) { it / 8 } +
+                    fadeIn(tween(ENTER_MS / 2))
+            },
+            popExitTransition = {
+                slideOutHorizontally(tween(EXIT_MS, easing = Accelerate)) { it / 8 } +
+                    fadeOut(tween(EXIT_MS))
+            },
+        ) {
+            ManageBiblesScreen(container = container, settings = settings, onBack = { navController.popBackStack() })
         }
         composable(
             Routes.NOTES,

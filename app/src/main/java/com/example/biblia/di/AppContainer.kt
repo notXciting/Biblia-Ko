@@ -10,6 +10,7 @@ import com.example.biblia.data.BibleVersionRegistry
 import com.example.biblia.data.db.BibleDatabase
 import com.example.biblia.data.db.SearchIndex
 import com.example.biblia.data.importer.BibleImporter
+import com.example.biblia.data.importer.VersionLibrary
 import com.example.biblia.data.parser.BibleParser
 import com.example.biblia.data.parser.TagalogXmlBibleParser
 import com.example.biblia.data.repository.BibleRepository
@@ -75,6 +76,11 @@ class AppContainer(context: Context) {
             parsers[version.formatId] ?: TagalogXmlBibleParser()
         },
         onImported = { versionId: String -> bibleRepository.invalidateCounts(versionId) },
+    )
+
+    /** Load / unload Bibles (Manage Bibles screen). */
+    val versionLibrary = VersionLibrary(
+        appContext, database, settingsRepository, searchIndex, importer, chapterCache, bibleRepository,
     )
 
     /** Main-thread scope for "Listen" (TTS state and callbacks live here). */

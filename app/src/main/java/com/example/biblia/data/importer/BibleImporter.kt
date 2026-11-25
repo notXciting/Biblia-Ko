@@ -46,6 +46,15 @@ class BibleImporter(
     private val _states = MutableStateFlow<Map<String, ImportState>>(emptyMap())
     val states: StateFlow<Map<String, ImportState>> = _states.asStateFlow()
 
+    /** Runs [block] under the import lock, so it never overlaps an import or re-index. */
+    internal suspend fun <T> exclusive(block: suspend () -> T): T = mutex.withLock { block() }
+
+    /** Forgets [versionId]'s import state after it is unloaded. */
+    internal fun forget(versionId: String) {
+        importedThisRun -= versionId
+        _states.update { it - versionId }
+    }
+
     fun stateFor(versionId: String): ImportState =
         _states.value[versionId] ?: ImportState(versionId)
 

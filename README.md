@@ -4,7 +4,7 @@
 
 **An offline Tagalog & English Bible for Android: fast, clean, and built for daily reading.**
 
-[![Download APK](https://img.shields.io/badge/Download-APK%20v3.0.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
+[![Download APK](https://img.shields.io/badge/Download-APK%20v3.1.0-2E7D32?style=for-the-badge&logo=android&logoColor=white)](../../releases/latest)
 
 ![Android](https://img.shields.io/badge/Android-7.0%2B-3DDC84?logo=android&logoColor=white)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
@@ -20,12 +20,13 @@
   <img src="docs/screenshots/compare.png" width="200" alt="Compare a passage across versions">
 </p>
 
-Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles ten translations (two Tagalog, eight English), searches across the whole Bible quickly, opens any verse instantly, and can **read the Bible aloud** in Tagalog or English using your phone's built-in offline voices.
+Biblia Ko works **completely offline**. It needs no account and no internet, and asks for **no permissions** (internet, storage, location, and so on). It bundles eleven translations (two Tagalog, nine English), searches across the whole Bible quickly, opens any verse instantly, and can **read the Bible aloud** in Tagalog or English using your phone's built-in offline voices.
 
 ## Features
 
 ### Reading
-- **Ten Bible versions** in Tagalog and English, switchable at any time. The reader **stays on the verse you are reading** when you switch.
+- **Eleven Bible versions** in Tagalog and English, switchable at any time. The reader **stays on the verse you are reading** when you switch.
+- **Load only the Bibles you use.** The version picker lists your loaded Bibles for one-tap switching; **Manage Bibles** shows all eleven with their size, so you can load or remove any of them (about 8 MB each). Highlights and notes are never affected.
 - **Swipe between chapters**, or use the page arrows. Your place is remembered between sessions.
 - **Combined verses are labelled as ranges.** Where a translation merges verses (common in the Tagalog versions), the reader shows e.g. Ruth 1:**1-2**. References, highlights, Compare and Listen all use the full range.
 - **Two verse layouts:** a flowing *Paragraph* or *Verse by verse*, each verse on its own line.
@@ -50,7 +51,7 @@ Tap any verse to open the verse panel:
 - **Highlight** in five colours. Highlights are saved per verse and show in every translation.
 - **Copy** or **Share** with a formatted reference, e.g. *"…" – Juan 3:16-17 (MBB12)*.
 - **Compare** the selected verses side by side in every installed version.
-- **Cross-references:** the verse panel lists up to 10 related passages for the selected verse, with their text in the Bible you are reading. Tap one to jump to it. Works offline in all ten versions, including verses that a translation combines (e.g. Ruth 1:1-2).
+- **Cross-references:** the verse panel lists up to 10 related passages for the selected verse, with their text in the Bible you are reading. Tap one to jump to it. Works offline in every version, including verses that a translation combines (e.g. Ruth 1:1-2).
 - **Notes:** write a personal note, prayer or reflection on one or more verses. A small note icon marks noted verses in the reader; tap it to read or edit the note. Like highlights, notes show in every translation.
 - **All your notes in one place:** the notebook button in the reader opens a searchable list of your notes, sorted by newest or in Bible order. Open a note to edit it, share it, or jump straight to its verse.
 
@@ -67,17 +68,17 @@ Tap any verse to open the verse panel:
 <p align="center">
   <img src="docs/screenshots/notes.png" width="200" alt="All notes in one list">
   <img src="docs/screenshots/note.png" width="200" alt="A note with go-to-verse and share">
-  <img src="docs/screenshots/versions.png" width="200" alt="Ten Bible versions">
+  <img src="docs/screenshots/versions.png" width="200" alt="Bible version picker">
   <img src="docs/screenshots/themes.png" width="200" alt="Themes and accent colours (Takipsilim)">
 </p>
 
 ## Download & install
 
-1. Download **`BibliaKo-v3.0.0.apk`** from the [latest release](../../releases/latest).
+1. Download **`BibliaKo-v3.1.0.apk`** from the [latest release](../../releases/latest).
 2. Open it on your phone. If asked, allow your browser or file manager to *install unknown apps*.
-3. On first launch the app prepares the default Bible (a few seconds). Every other version is prepared the first time you select it.
+3. On first launch the app prepares the default Bible (a few seconds). Load more Bibles any time from the version picker → **Manage Bibles**.
 
-**Requirements:** Android 7.0 (API 24) or newer, and about 100 MB of free storage once all ten versions are installed (roughly 8 MB per version). Reading aloud uses the phone's text-to-speech engine (for example *Speech Services by Google*, preinstalled on most phones) with a downloaded offline voice for each language.
+**Requirements:** Android 7.0 (API 24) or newer, and roughly 8 MB of free storage per loaded Bible (about 110 MB with all eleven). Reading aloud uses the phone's text-to-speech engine (for example *Speech Services by Google*, preinstalled on most phones) with a downloaded offline voice for each language.
 
 > The release APK is signed with a development key for direct installation. It is not distributed through Google Play.
 
@@ -92,6 +93,7 @@ Tap any verse to open the verse panel:
 | **ESV** | English Standard Version | English | © 2001 Crossway Bibles (Text Edition 2016) |
 | **HCSB** | Holman Christian Standard Bible | English | © 2004 Holman Bible Publishers |
 | **KJV** | King James Version | English | Public domain |
+| **NASB** | New American Standard Bible (1995) | English | © 1960–1995 The Lockman Foundation |
 | **NIV** | New International Version | English | © 1973, 1978, 1984, 2011 Biblica, Inc. |
 | **NKJV** | New King James Version | English | © 1982 Thomas Nelson |
 | **NLT** | New Living Translation | English | © 1996, 2004, 2015 Tyndale House Foundation |
@@ -131,7 +133,7 @@ sdk.dir=C\:\\path\\to\\Android\\Sdk
 ```bash
 ./gradlew assembleDebug          # debug APK  -> app/build/outputs/apk/debug/
 ./gradlew assembleRelease        # release APK -> app/build/outputs/apk/release/
-./gradlew :app:testDebugUnitTest # unit tests (96)
+./gradlew :app:testDebugUnitTest # unit tests (100)
 ```
 
 On Windows, use `gradlew.bat`. To run a single test class:

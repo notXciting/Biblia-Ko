@@ -20,6 +20,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,7 +41,7 @@ import com.example.biblia.ui.KeepAppLocale
 
 /** The selected verses in every version, one block per version. */
 @Composable
-fun CompareSheet(state: CompareState, currentVersionId: String, onDismiss: () -> Unit) {
+fun CompareSheet(state: CompareState, currentVersionId: String, onDismiss: () -> Unit, onAddVersion: () -> Unit) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -70,6 +71,10 @@ fun CompareSheet(state: CompareState, currentVersionId: String, onDismiss: () ->
                         )
                     }
                     CompareBlock(row, isCurrent = row.version.id == currentVersionId)
+                }
+                // Only loaded Bibles are compared: offer the Manage screen for more.
+                TextButton(onClick = onAddVersion, modifier = Modifier.padding(top = 4.dp)) {
+                    Text(stringResource(R.string.compare_add_version))
                 }
             }
         }
@@ -103,20 +108,11 @@ private fun CompareBlock(row: CompareRow, isCurrent: Boolean) {
             )
         }
         Spacer(Modifier.height(8.dp))
-        val verses = row.verses
-        if (verses == null) {
-            Text(
-                text = stringResource(R.string.compare_not_installed),
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.onSurfaceVariant,
-            )
-        } else {
-            Text(
-                text = numberedText(verses, row.spanEnds, colors.primary),
-                style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Serif),
-                color = colors.onSurface,
-            )
-        }
+        Text(
+            text = numberedText(row.verses, row.spanEnds, colors.primary),
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Serif),
+            color = colors.onSurface,
+        )
     }
 }
 

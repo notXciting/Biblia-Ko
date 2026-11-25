@@ -130,7 +130,6 @@
     <string name="verse_action_compare">Ihambing</string>
     <string name="verse_action_remove_highlight">Alisin ang marka</string>
     <string name="compare_title">Ihambing ang mga bersyon</string>
-    <string name="compare_not_installed">Hindi pa naka-install. Piliin ito sa listahan ng mga bersyon para ma-install.</string>
     <!-- ===== Pagkakaayos ng talata ===== -->
     <string name="settings_verse_layout">Pagkakaayos ng mga talata</string>
     <string name="verse_layout_paragraph">Tuloy-tuloy</string>
@@ -222,4 +221,15 @@
     <string name="crossref_font_serif">Serif (italic)</string>
     <string name="crossref_font_sans">Sans</string>
     <string name="about_crossrefs_credit">Mga kaugnay na talata mula sa OpenBible.info (CC BY 4.0), batay sa Treasury of Scripture Knowledge.</string>
+    <string name="manage_bibles">Pamahalaan ang mga Biblia</string>
+    <string name="bibles_title">Mga Biblia</string>
+    <string name="bibles_summary">%1$d naka-load · ~%2$d MB</string>
+    <string name="bibles_size">~%1$d MB</string>
+    <string name="bibles_load">I-load</string>
+    <string name="bibles_unload">Alisin</string>
+    <string name="bibles_in_use">Ginagamit</string>
+    <string name="bibles_unloading">Inaalis…</string>
+    <string name="bibles_unload_title">Alisin ang %1$s?</string>
+    <string name="bibles_unload_body">Mababakante ang ~%1$d MB. Maaari mo itong i-load muli anumang oras. Hindi maaapektuhan ang iyong mga marka at tala.</string>
+    <string name="compare_add_version">Magdagdag ng bersyon</string>
 </resources>

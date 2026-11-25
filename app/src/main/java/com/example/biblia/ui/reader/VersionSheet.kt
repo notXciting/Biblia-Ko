@@ -1,4 +1,4 @@
-﻿@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
 
 package com.example.biblia.ui.reader
 
@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LibraryBooks
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -42,9 +44,11 @@ import com.example.biblia.data.importer.ImportState
 import com.example.biblia.ui.KeepAppLocale
 
 /**
- * Version switcher. Each row: abbreviation badge, full name + language, and a
- * check for the current version. Selecting an uninstalled version imports it
- * (progress drawn inside the row) and switches when done, keeping the verse.
+ * Version switcher (quick picker) for the LOADED Bibles. Each row:
+ * abbreviation badge, full name + language, and a check for the current
+ * version. A version still being prepared shows its progress in the row and
+ * switches when done, keeping the verse. "Pamahalaan ang mga Biblia" opens the
+ * Manage screen to load or remove versions.
  */
 @Composable
 fun VersionBottomSheet(
@@ -53,6 +57,7 @@ fun VersionBottomSheet(
     importStates: Map<String, ImportState>,
     onSelect: (BibleVersion) -> Unit,
     onDismiss: () -> Unit,
+    onManage: () -> Unit,
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -68,7 +73,8 @@ fun VersionBottomSheet(
             modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
         )
         Spacer(Modifier.height(8.dp))
-        // Scrollable: 10 versions no longer fit on one screen.
+        // Only loaded Bibles (and one being prepared) are listed: switching is one tap.
+        // Loading / removing others happens on the Manage screen (button below).
         Column(
             Modifier
                 .verticalScroll(rememberScrollState())
@@ -82,6 +88,16 @@ fun VersionBottomSheet(
                     state = importStates[version.id] ?: ImportState(version.id),
                     onClick = { onSelect(version) },
                 )
+            }
+            OutlinedButton(
+                onClick = onManage,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+            ) {
+                Icon(Icons.Outlined.LibraryBooks, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.manage_bibles))
             }
         }
     } } }

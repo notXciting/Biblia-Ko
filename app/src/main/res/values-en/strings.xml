@@ -129,7 +129,6 @@
     <string name="verse_action_compare">Compare</string>
     <string name="verse_action_remove_highlight">Remove highlight</string>
     <string name="compare_title">Compare versions</string>
-    <string name="compare_not_installed">Not installed yet. Pick it in the version list to install it.</string>
     <!-- ===== Verse layout ===== -->
     <string name="settings_verse_layout">Verse layout</string>
     <string name="verse_layout_paragraph">Paragraph</string>
@@ -221,4 +220,15 @@
     <string name="crossref_font_serif">Serif (italic)</string>
     <string name="crossref_font_sans">Sans</string>
     <string name="about_crossrefs_credit">Cross-references from OpenBible.info (CC BY 4.0), based on the Treasury of Scripture Knowledge.</string>
+    <string name="manage_bibles">Manage Bibles</string>
+    <string name="bibles_title">Bibles</string>
+    <string name="bibles_summary">%1$d loaded · ~%2$d MB</string>
+    <string name="bibles_size">~%1$d MB</string>
+    <string name="bibles_load">Load</string>
+    <string name="bibles_unload">Remove</string>
+    <string name="bibles_in_use">In use</string>
+    <string name="bibles_unloading">Removing…</string>
+    <string name="bibles_unload_title">Remove %1$s?</string>
+    <string name="bibles_unload_body">This frees about %1$d MB. You can load it again at any time. Your highlights and notes are not affected.</string>
+    <string name="compare_add_version">Add a version</string>
 </resources>
