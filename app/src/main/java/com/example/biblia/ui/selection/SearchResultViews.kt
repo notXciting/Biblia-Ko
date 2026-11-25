@@ -28,6 +28,7 @@ import com.example.biblia.domain.model.VerseReference
 import com.example.biblia.domain.search.SearchQueryBuilder
 import com.example.biblia.domain.search.SnippetBuilder
 import com.example.biblia.domain.search.VerseSnippet
+import com.example.biblia.ui.theme.LocalReadingType
 
 /** Shared search views: smart-jump card + result card with highlighted snippet. */
 
@@ -76,6 +77,7 @@ internal fun SearchResultCard(verse: Verse, query: String, onClick: () -> Unit) 
             Text(
                 text = highlightSnippet(snippet),
                 style = MaterialTheme.typography.bodyMedium,
+                fontFamily = LocalReadingType.current.family,
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,

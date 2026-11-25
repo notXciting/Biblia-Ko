@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.withStyle
@@ -38,6 +37,7 @@ import com.example.biblia.R
 import com.example.biblia.domain.model.Verse
 import com.example.biblia.domain.model.VerseSpans
 import com.example.biblia.ui.KeepAppLocale
+import com.example.biblia.ui.theme.LocalReadingType
 
 /** The selected verses in every version, one block per version. */
 @Composable
@@ -110,7 +110,7 @@ private fun CompareBlock(row: CompareRow, isCurrent: Boolean) {
         Spacer(Modifier.height(8.dp))
         Text(
             text = numberedText(row.verses, row.spanEnds, colors.primary),
-            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = FontFamily.Serif),
+            style = MaterialTheme.typography.bodyLarge.copy(fontFamily = LocalReadingType.current.family),
             color = colors.onSurface,
         )
     }

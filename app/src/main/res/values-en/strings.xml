@@ -249,4 +249,23 @@
     <string name="theme_paper">Paper</string>
     <string name="settings_paper_grain">Paper texture</string>
     <string name="settings_paper_grain_hint">A faint paper grain on the reading page.</string>
+    <string name="note_autosave_hint">Saved automatically as you type.</string>
+    <string name="settings_reading_font">Reading font</string>
+    <string name="reading_font_hint">For Bible text, notes and search results</string>
+    <string name="reading_font_system">System default</string>
+    <string name="reading_font_tag_default">Default</string>
+    <string name="reading_font_tag_legible">Easy to tell letters apart</string>
+    <string name="reading_font_tag_dyslexia">For readers with dyslexia</string>
+    <string name="reading_font_tag_system">Your phone\'s serif font</string>
+    <string name="reading_font_unavailable">This font couldn\'t be loaded</string>
+    <string name="licenses_title">Open source licenses</string>
+    <string name="licenses_fonts">Fonts</string>
+    <string name="licenses_data">Data</string>
+    <string name="licenses_show">Show license</string>
+    <string name="licenses_hide">Hide license</string>
+    <string name="settings_page_reading">Reading</string>
+    <string name="settings_page_appearance">Appearance</string>
+    <string name="settings_page_app">App</string>
+    <string name="settings_listen_summary">Voice, speed and pitch</string>
+    <string name="settings_backup_summary">Export or import highlights, notes and settings</string>
 </resources>

@@ -115,9 +115,11 @@ fun StudyScreen(container: AppContainer, settings: AppSettings, onBack: () -> Un
     notesVm.editor?.let { editor ->
         NoteSheet(
             state = editor,
-            onSave = notesVm::save,
-            onDelete = notesVm::delete,
-            onDismiss = notesVm::close,
+            onSave = notesVm.noteEditor::save,
+            onDelete = notesVm.noteEditor::delete,
+            onDismiss = notesVm.noteEditor::dismiss,
+            onCancel = notesVm.noteEditor::cancel,
+            onAutosave = notesVm.noteEditor::autosave,
             onGoToVerse = { text -> notesVm.goToVerse(text, onOpenReader) },
         )
     }

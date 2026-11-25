@@ -74,6 +74,7 @@ object BackupCodec {
         put("noteSort", s.noteSort.name)
         put("showCrossRefs", s.showCrossRefs); put("crossRefFont", s.crossRefFont.name)
         put("barSize", s.barSize.name); put("paperGrain", s.paperGrain)
+        put("readingFont", s.readingFont.name)
         put("ttsRate", s.tts.rate.toDouble()); put("ttsPitch", s.tts.pitch.toDouble())
         put("ttsSpeakVerseNumbers", s.tts.speakVerseNumbers)
         put("ttsVoices", JSONObject(s.tts.voices))
@@ -99,6 +100,7 @@ object BackupCodec {
             crossRefFont = enumOf(o, "crossRefFont", d.crossRefFont),
             barSize = enumOf(o, "barSize", d.barSize),
             paperGrain = o.optBoolean("paperGrain", d.paperGrain),
+            readingFont = enumOf(o, "readingFont", d.readingFont),
             tts = TtsPrefs(
                 rate = o.optDouble("ttsRate", 1.0).toFloat().coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = o.optDouble("ttsPitch", 1.0).toFloat().coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),

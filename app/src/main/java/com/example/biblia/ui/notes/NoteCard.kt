@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.biblia.domain.model.VerseNote
 import com.example.biblia.ui.reader.formatNoteDate
+import com.example.biblia.ui.theme.LocalReadingType
 
 /** One note in the list: reference, last-edited date and the start of the note. */
 @Composable
@@ -54,6 +55,7 @@ internal fun NoteCard(note: VerseNote, reference: String, onClick: () -> Unit) {
             Text(
                 text = note.text,
                 style = MaterialTheme.typography.bodyMedium,
+                fontFamily = LocalReadingType.current.family,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
             )

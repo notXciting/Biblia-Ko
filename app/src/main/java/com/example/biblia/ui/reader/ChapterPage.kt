@@ -42,6 +42,7 @@ import com.example.biblia.domain.model.VerseLayout
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import com.example.biblia.ui.theme.LocalReadingType
 
 private const val SKELETON_DELAY_MS = 150L
 
@@ -110,7 +111,7 @@ fun ChapterPage(
         Spacer(Modifier.height(20.dp))
         val verses = content?.verses.orEmpty()
         AnimatedVisibility(visible = showSkeleton, enter = fadeIn(tween(200)), exit = fadeOut(tween(120))) {
-            ChapterSkeleton(fontSize = fontSizeSp.sp, lineHeightMultiplier = lineSpacingMultiplier)
+            ChapterSkeleton(fontSize = fontSizeSp.sp, lineHeightMultiplier = lineSpacingMultiplier * LocalReadingType.current.lineHeight)
         }
         if (verses.isNotEmpty()) {
             ChapterFlowText(

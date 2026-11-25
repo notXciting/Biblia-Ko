@@ -56,7 +56,9 @@ class VerseActions(private val container: AppContainer, private val scope: Corou
     private var compareJob: Job? = null
 
     var compare by mutableStateOf<CompareState?>(null); private set
-    var noteEditor by mutableStateOf<NoteEditorState?>(null); private set
+    /** The open note sheet, with autosave. */
+    val notes = NoteEditorController(noteRepo, scope)
+    val noteEditor: NoteEditorState? get() = notes.state
 
     fun notes(book: Int, chapter: Int): Flow<List<VerseNote>> = noteRepo.observeChapter(book, chapter)
 
@@ -65,8 +67,8 @@ class VerseActions(private val container: AppContainer, private val scope: Corou
         if (verses.isEmpty()) return
         scope.launch {
             val existing = NoteVerses.exact(noteRepo.chapter(book, chapter), verses)
-            noteEditor = NoteEditorState(
-                reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty(), existing?.updatedAt,
+            notes.show(
+                NoteEditorState(reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty(), existing?.updatedAt),
             )
         }
     }
@@ -75,26 +77,11 @@ class VerseActions(private val container: AppContainer, private val scope: Corou
     fun openNoteById(id: Long, reference: (VerseNote) -> String, quote: (VerseNote) -> String) {
         scope.launch {
             val note = noteRepo.byId(id) ?: return@launch
-            noteEditor = NoteEditorState(
-                reference(note), note.book, note.chapter, note.verses, quote(note), note.id, note.text, note.updatedAt,
+            notes.show(
+                NoteEditorState(reference(note), note.book, note.chapter, note.verses, quote(note), note.id, note.text, note.updatedAt),
             )
         }
     }
-
-    /** Saves the editor's note (blank text deletes it) and closes the editor. */
-    fun saveNote(text: String) {
-        val editor = noteEditor ?: return
-        noteEditor = null
-        scope.launch { noteRepo.save(editor.noteId, editor.book, editor.chapter, editor.verses, text) }
-    }
-
-    fun deleteNote() {
-        val id = noteEditor?.noteId
-        noteEditor = null
-        if (id != null) scope.launch { noteRepo.delete(id) }
-    }
-
-    fun closeNote() { noteEditor = null }
 
     fun highlights(book: Int, chapter: Int): Flow<Map<Int, HighlightColor>> =
         highlightRepo.observeChapter(book, chapter)

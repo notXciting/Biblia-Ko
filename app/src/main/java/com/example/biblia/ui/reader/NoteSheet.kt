@@ -30,6 +30,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.delay
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +43,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,6 +51,7 @@ import com.example.biblia.R
 import com.example.biblia.ui.KeepAppLocale
 import java.text.DateFormat
 import java.util.Date
+import com.example.biblia.ui.theme.LocalReadingType
 
 /**
  * Note editor for a verse selection: reference, a short quote of the verses,
@@ -61,7 +62,12 @@ fun NoteSheet(
     state: NoteEditorState,
     onSave: (String) -> Unit,
     onDelete: () -> Unit,
-    onDismiss: () -> Unit,
+    /** Back / tap outside / swipe down: keeps the typed text. */
+    onDismiss: (String) -> Unit,
+    /** "Kanselahin": undo this session's changes. */
+    onCancel: () -> Unit,
+    /** Called ~0.8 s after typing stops. */
+    onAutosave: (String) -> Unit,
     /** Shown from the notes list: jump to the verse (gets the typed text so edits are kept). */
     onGoToVerse: ((String) -> Unit)? = null,
 ) {
@@ -69,7 +75,7 @@ fun NoteSheet(
     var text by rememberSaveable(state.noteId, state.verses) { mutableStateOf(state.text) }
     val focus = remember { FocusRequester() }
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss(text) },
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
     ) {
@@ -103,7 +109,7 @@ fun NoteSheet(
                     Text(
                         text = "“" + state.quote + "”",
                         style = MaterialTheme.typography.bodyMedium,
-                        fontFamily = FontFamily.Serif,
+                        fontFamily = LocalReadingType.current.family,
                         fontStyle = FontStyle.Italic,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 3,
@@ -133,6 +139,7 @@ fun NoteSheet(
                     value = text,
                     onValueChange = { text = it },
                     placeholder = { Text(stringResource(R.string.note_hint)) },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(fontFamily = LocalReadingType.current.family),
                     minLines = 4,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -140,10 +147,16 @@ fun NoteSheet(
                         .padding(top = 8.dp)
                         .focusRequester(focus),
                 )
+                Text(
+                    text = stringResource(R.string.note_autosave_hint),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp, start = 4.dp),
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                    modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 ) {
                     if (state.noteId != null) {
                         TextButton(onClick = onDelete) {
@@ -153,7 +166,7 @@ fun NoteSheet(
                         }
                     }
                     Spacer(Modifier.weight(1f))
-                    TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+                    TextButton(onClick = onCancel) { Text(stringResource(R.string.action_cancel)) }
                     Button(
                         onClick = { onSave(text) },
                         enabled = text.isNotBlank() || state.noteId != null,
@@ -164,6 +177,11 @@ fun NoteSheet(
     }
     // New note: open the keyboard right away.
     LaunchedEffect(state.noteId) { if (state.noteId == null) runCatching { focus.requestFocus() } }
+    // Autosave: write what was typed shortly after typing stops.
+    LaunchedEffect(text) {
+        delay(AUTOSAVE_DELAY_MS)
+        onAutosave(text)
+    }
 }
 
 /** "Juan 3:16" + the verse text + the note, through the system share sheet. */
@@ -186,3 +204,5 @@ internal fun formatNoteDate(time: Long): String {
     val locale = LocalConfiguration.current.locales[0]
     return remember(time, locale) { DateFormat.getDateInstance(DateFormat.MEDIUM, locale).format(Date(time)) }
 }
+
+private const val AUTOSAVE_DELAY_MS = 800L

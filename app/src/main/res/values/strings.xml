@@ -250,4 +250,23 @@
     <string name="theme_paper">Papel</string>
     <string name="settings_paper_grain">Tekstura ng papel</string>
     <string name="settings_paper_grain_hint">Banayad na butil ng papel sa pahina ng pagbabasa.</string>
+    <string name="note_autosave_hint">Awtomatikong nase-save habang nagta-type.</string>
+    <string name="settings_reading_font">Font ng pagbasa</string>
+    <string name="reading_font_hint">Para sa teksto ng Biblia, mga tala at resulta ng paghahanap</string>
+    <string name="reading_font_system">Default ng sistema</string>
+    <string name="reading_font_tag_default">Default</string>
+    <string name="reading_font_tag_legible">Malinaw ang bawat titik</string>
+    <string name="reading_font_tag_dyslexia">Para sa may dyslexia</string>
+    <string name="reading_font_tag_system">Ang serif na font ng telepono</string>
+    <string name="reading_font_unavailable">Hindi ma-load ang font na ito</string>
+    <string name="licenses_title">Mga open-source na lisensya</string>
+    <string name="licenses_fonts">Mga font</string>
+    <string name="licenses_data">Datos</string>
+    <string name="licenses_show">Ipakita ang lisensya</string>
+    <string name="licenses_hide">Itago ang lisensya</string>
+    <string name="settings_page_reading">Pagbasa</string>
+    <string name="settings_page_appearance">Hitsura</string>
+    <string name="settings_page_app">App</string>
+    <string name="settings_listen_summary">Boses, bilis at tono ng pagbasa</string>
+    <string name="settings_backup_summary">I-export o i-import ang mga marka, tala at setting</string>
 </resources>

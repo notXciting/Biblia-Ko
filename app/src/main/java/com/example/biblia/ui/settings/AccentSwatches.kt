@@ -88,7 +88,7 @@ private fun Swatch(accent: AccentColor, color: Color, selected: Boolean, onClick
     }
 }
 
-private fun accentLabel(accent: AccentColor): Int = when (accent) {
+internal fun accentLabel(accent: AccentColor): Int = when (accent) {
     AccentColor.BLUE -> R.string.cd_accent_blue
     AccentColor.INDIGO -> R.string.cd_accent_indigo
     AccentColor.PURPLE -> R.string.cd_accent_purple

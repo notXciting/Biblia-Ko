@@ -1,182 +1,124 @@
 package com.example.biblia.ui.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.biblia.BuildConfig
 import com.example.biblia.R
-import com.example.biblia.data.BibleVersionRegistry
-import com.example.biblia.di.AppContainer
+import com.example.biblia.domain.model.AppLanguage
 import com.example.biblia.domain.model.AppSettings
-import com.example.biblia.domain.model.ThemeMode
+import kotlin.math.roundToInt
 
 /**
- * Settings: theme tiles, accent swatches, font size (live preview) and line
- * spacing — every change persists to DataStore and applies live app-wide.
+ * Settings menu: one row per [SettingsPage] with its icon and a one-line
+ * summary of the current values. Each row opens its own short page.
  */
 @Composable
-fun SettingsScreen(
-    container: AppContainer,
-    settings: AppSettings,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val vm: SettingsViewModel = viewModel(
-        factory = viewModelFactory { initializer { SettingsViewModel(container) } },
-    )
-    val haptics = LocalHapticFeedback.current
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .statusBarsPadding(),
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.action_back),
-                )
-            }
-            Text(
-                text = stringResource(R.string.settings_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.SemiBold,
-            )
-        }
+fun SettingsScreen(settings: AppSettings, onBack: () -> Unit, onOpenPage: (SettingsPage) -> Unit, modifier: Modifier = Modifier) {
+    Column(modifier.fillMaxSize().background(MaterialTheme.colorScheme.background).statusBarsPadding()) {
+        SettingsTopBar(stringResource(R.string.settings_title), onBack)
         Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 32.dp),
+                .navigationBarsPadding()
+                .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 24.dp),
         ) {
-            LanguageSection(
-                current = settings.appLanguage,
-                versionLanguage = BibleVersionRegistry.byId(settings.versionId).language,
-                onSelect = { value ->
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.setAppLanguage(value)
-                },
-            )
-            Spacer(Modifier.height(8.dp))
-            UiScaleSection(current = settings.uiScale, onChange = { vm.setUiScale(it) })
-            Spacer(Modifier.height(8.dp))
-            BarSizeSection(current = settings.barSize, onSelect = { vm.setBarSize(it) })
-            Spacer(Modifier.height(16.dp))
-            AppIconSection(
-                current = settings.appIcon,
-                onSelect = { icon ->
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.setAppIcon(icon)
-                },
-            )
-            Spacer(Modifier.height(8.dp))
-            SectionTitle(stringResource(R.string.settings_theme))
-            ThemeTiles(
-                current = settings.themeMode,
-                accent = settings.accent,
-                onSelect = { mode ->
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.setThemeMode(mode)
-                },
-            )
-            if (settings.themeMode == ThemeMode.PAPER) {
-                PaperGrainRow(checked = settings.paperGrain, onChange = { vm.setPaperGrain(it) })
+            SettingsPage.entries.forEach { page ->
+                MenuRow(page, summaryOf(page, settings), onClick = { onOpenPage(page) })
             }
-            Spacer(Modifier.height(16.dp))
-            SectionTitle(stringResource(R.string.settings_accent_color))
-            AccentSwatches(
-                current = settings.accent,
-                darkTheme = settings.themeMode.isDark(isSystemInDarkTheme()),
-                onSelect = { color ->
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.setAccent(color)
-                },
-            )
-            Spacer(Modifier.height(8.dp))
-            FontSizeSection(
-                fontSizeSp = settings.fontSizeSp,
-                lineSpacing = settings.lineSpacing,
-                // John 3:16 in the Bible currently in use (fixed text as fallback).
-                previewReference = vm.fontPreviewReference,
-                previewText = vm.fontPreviewText,
-                onChange = { vm.setFontSizeSp(it) },
-            )
-            Spacer(Modifier.height(8.dp))
-            LineSpacingSection(
-                current = settings.lineSpacing,
-                onSelect = { value ->
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.setLineSpacing(value)
-                },
-            )
-            Spacer(Modifier.height(8.dp))
-            VerseLayoutSection(
-                current = settings.verseLayout,
-                previewVerses = vm.previewVerses,
-                previewReference = vm.previewReference,
-                fontSizeSp = settings.fontSizeSp,
-                lineSpacingMultiplier = settings.lineSpacing.multiplier,
-                onSelect = { value ->
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    vm.setVerseLayout(value)
-                },
-            )
-            Spacer(Modifier.height(8.dp))
-            CrossRefSettingsSection(
-                show = settings.showCrossRefs,
-                font = settings.crossRefFont,
-                onShow = { vm.setShowCrossRefs(it) },
-                onFont = { vm.setCrossRefFont(it) },
-            )
-            Spacer(Modifier.height(8.dp))
-            ListenSection(
-                prefs = settings.tts,
-                languages = vm.ttsLanguages,
-                voices = vm.ttsVoices,
-                status = vm.ttsStatus,
-                onRefresh = { vm.refreshVoices() },
-                onVoiceHelp = { language, status -> vm.showVoiceHelp(language, status) },
-                onRate = { vm.setTtsRate(it) },
-                onPitch = { vm.setTtsPitch(it) },
-                onVoice = { language, name -> vm.setTtsVoice(language, name) },
-                onSpeakNumbers = { vm.setTtsSpeakNumbers(it) },
-                onTest = { vm.testVoice(BibleVersionRegistry.byId(settings.versionId).language) },
-            )
-            Spacer(Modifier.height(8.dp))
-            BackupSection(container = container)
-            Spacer(Modifier.height(8.dp))
-            AboutSection(currentVersionId = settings.versionId)
         }
     }
+}
+
+/** Back arrow + title, shared by the menu and every sub-page. */
+@Composable
+internal fun SettingsTopBar(title: String, onBack: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 6.dp),
+    ) {
+        IconButton(onClick = onBack) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.action_back))
+        }
+        Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+    }
+}
+
+@Composable
+private fun MenuRow(page: SettingsPage, summary: String, onClick: () -> Unit) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        onClick = onClick,
+        shape = RoundedCornerShape(16.dp),
+        color = colors.surfaceContainerLow,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp)) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(40.dp).background(colors.primaryContainer, CircleShape),
+            ) {
+                Icon(page.icon, contentDescription = null, tint = colors.onPrimaryContainer)
+            }
+            Spacer(Modifier.width(16.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(page.title), style = MaterialTheme.typography.titleMedium, color = colors.onSurface)
+                Text(
+                    text = summary,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = colors.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null, tint = colors.onSurfaceVariant)
+        }
+    }
+}
+
+@Composable
+private fun summaryOf(page: SettingsPage, s: AppSettings): String = when (page) {
+    SettingsPage.READING ->
+        readingFontName(s.readingFont) + " · " + stringResource(R.string.settings_font_value, s.fontSizeSp.roundToInt())
+    SettingsPage.APPEARANCE ->
+        stringResource(themeLabel(s.themeMode)) + " · " + stringResource(accentLabel(s.accent))
+    SettingsPage.LISTEN -> stringResource(R.string.settings_listen_summary)
+    SettingsPage.APP -> when (s.appLanguage) {
+        AppLanguage.FOLLOW_VERSION -> stringResource(R.string.language_follow_version)
+        AppLanguage.TAGALOG -> "Tagalog"
+        AppLanguage.ENGLISH -> "English"
+    } + " · " + (s.uiScale * 100).roundToInt() + "%"
+    SettingsPage.BACKUP -> stringResource(R.string.settings_backup_summary)
+    SettingsPage.ABOUT -> stringResource(R.string.settings_app_version) + " " + BuildConfig.VERSION_NAME
 }

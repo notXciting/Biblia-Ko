@@ -16,12 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.biblia.ui.theme.PageStyle
+import com.example.biblia.ui.theme.LocalReadingType
 
 /**
  * Chapter heading. Default: accent book label, serif "Kabanata 3", short
@@ -43,7 +43,7 @@ internal fun ChapterHeading(bookName: String, chapterTitle: String, page: PageSt
             Text(
                 text = chapterTitle,
                 style = MaterialTheme.typography.headlineMedium,
-                fontFamily = FontFamily.Serif,
+                fontFamily = LocalReadingType.current.family,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onBackground,
             )
@@ -60,7 +60,7 @@ internal fun ChapterHeading(bookName: String, chapterTitle: String, page: PageSt
         Text(
             text = bookName.uppercase(),
             style = MaterialTheme.typography.titleSmall,
-            fontFamily = FontFamily.Serif,
+            fontFamily = LocalReadingType.current.family,
             letterSpacing = 3.sp,
             color = page.verseNumber,
             textAlign = TextAlign.Center,
@@ -69,7 +69,7 @@ internal fun ChapterHeading(bookName: String, chapterTitle: String, page: PageSt
         Text(
             text = chapterTitle,
             style = MaterialTheme.typography.headlineSmall,
-            fontFamily = FontFamily.Serif,
+            fontFamily = LocalReadingType.current.family,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
         )

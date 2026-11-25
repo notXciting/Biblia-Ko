@@ -116,9 +116,11 @@ fun ReaderScreen(
     vm.actions.noteEditor?.let { editor ->
         NoteSheet(
             state = editor,
-            onSave = { vm.actions.saveNote(it) },
-            onDelete = { vm.actions.deleteNote() },
-            onDismiss = { vm.actions.closeNote() },
+            onSave = vm.actions.notes::save,
+            onDelete = vm.actions.notes::delete,
+            onDismiss = vm.actions.notes::dismiss,
+            onCancel = vm.actions.notes::cancel,
+            onAutosave = vm.actions.notes::autosave,
         )
     }
     if (vm.sheetVisible) {

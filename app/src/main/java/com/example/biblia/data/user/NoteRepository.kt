@@ -22,15 +22,16 @@ class NoteRepository(private val dao: NoteDao) {
      * Creates ([id] null) or updates a note. Blank text deletes an existing
      * note instead (clearing the text is how a note is removed too).
      */
-    suspend fun save(id: Long?, book: Int, chapter: Int, verses: Set<Int>, text: String) {
+    /** @return the note's id (new or existing), or null when blank text removed it. */
+    suspend fun save(id: Long?, book: Int, chapter: Int, verses: Set<Int>, text: String): Long? {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) {
             if (id != null) dao.delete(id)
-            return
+            return null
         }
         val now = System.currentTimeMillis()
         val existing = id?.let { dao.byId(it) }
-        dao.upsert(
+        val rowId = dao.upsert(
             NoteEntity(
                 id = id ?: 0,
                 book = book,
@@ -42,6 +43,7 @@ class NoteRepository(private val dao: NoteDao) {
                 updatedAt = now,
             )
         )
+        return id ?: rowId
     }
 
     suspend fun delete(id: Long) = dao.delete(id)

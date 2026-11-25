@@ -253,7 +253,28 @@ data class AppSettings(
     val paperGrain: Boolean = false,
     /** Height of the reader's top and bottom bars (Settings > "Laki ng mga bar"). */
     val barSize: BarSize = BarSize.NORMAL,
+    /** Typeface of Bible text, headings, notes and search results (Settings > "Font ng pagbasa"). */
+    val readingFont: ReadingFont = ReadingFont.DEFAULT,
 )
+
+/**
+ * Bundled reading typefaces (SIL OFL, res/font). [lineHeight] fine-tunes the
+ * line spacing setting per face: tall x-heights get a little more air, EB
+ * Garamond's small one a little less. [SYSTEM] is the phone's serif.
+ */
+enum class ReadingFont(val familyName: String, val lineHeight: Float) {
+    MERRIWEATHER("Merriweather", 1.04f),
+    LORA("Lora", 1.0f),
+    EB_GARAMOND("EB Garamond", 0.96f),
+    NOTO_SANS("Noto Sans", 1.0f),
+    ATKINSON("Atkinson Hyperlegible", 1.02f),
+    OPEN_DYSLEXIC("OpenDyslexic", 1.12f),
+    SYSTEM("", 1.0f);
+
+    companion object {
+        val DEFAULT = MERRIWEATHER
+    }
+}
 
 /** Reader bar size: compact hides the bottom bar labels; large adds room and bigger icons. */
 enum class BarSize(val topHeightDp: Int, val bottomHeightDp: Int) {

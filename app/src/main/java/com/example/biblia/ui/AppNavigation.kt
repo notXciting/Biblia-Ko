@@ -23,6 +23,9 @@ import com.example.biblia.ui.bibles.ManageBiblesScreen
 import com.example.biblia.ui.notes.StudyScreen
 import com.example.biblia.ui.reader.ReaderScreen
 import com.example.biblia.ui.selection.SelectionScreen
+import com.example.biblia.ui.settings.LicensesScreen
+import com.example.biblia.ui.settings.SettingsPage
+import com.example.biblia.ui.settings.SettingsPageScreen
 import com.example.biblia.ui.settings.SettingsScreen
 
 private const val TAG = "VERSE_NAV"
@@ -34,6 +37,7 @@ object Routes {
     const val SETTINGS = "settings"
     const val NOTES = "notes"
     const val BIBLES = "bibles"
+    const val LICENSES = "licenses"
 }
 
 /** Material "emphasized decelerate" / "accelerate" curves. */
@@ -107,10 +111,42 @@ fun BibleNavHost(container: AppContainer, settings: AppSettings, modifier: Modif
             },
         ) {
             SettingsScreen(
-                container = container,
                 settings = settings,
                 onBack = { navController.popBackStack() },
+                onOpenPage = { navController.navigate(Routes.SETTINGS + "/" + it.name) },
             )
+        }
+        composable(
+            Routes.SETTINGS + "/{page}",
+            enterTransition = {
+                slideInHorizontally(tween(ENTER_MS, easing = Decelerate)) { it / 8 } +
+                    fadeIn(tween(ENTER_MS / 2))
+            },
+            popExitTransition = {
+                slideOutHorizontally(tween(EXIT_MS, easing = Accelerate)) { it / 8 } +
+                    fadeOut(tween(EXIT_MS))
+            },
+        ) { entry ->
+            SettingsPageScreen(
+                container = container,
+                settings = settings,
+                page = SettingsPage.of(entry.arguments?.getString("page")),
+                onBack = { navController.popBackStack() },
+                onOpenLicenses = { navController.navigate(Routes.LICENSES) },
+            )
+        }
+        composable(
+            Routes.LICENSES,
+            enterTransition = {
+                slideInHorizontally(tween(ENTER_MS, easing = Decelerate)) { it / 8 } +
+                    fadeIn(tween(ENTER_MS / 2))
+            },
+            popExitTransition = {
+                slideOutHorizontally(tween(EXIT_MS, easing = Accelerate)) { it / 8 } +
+                    fadeOut(tween(EXIT_MS))
+            },
+        ) {
+            LicensesScreen(onBack = { navController.popBackStack() })
         }
         composable(
             Routes.BIBLES,

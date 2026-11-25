@@ -16,6 +16,7 @@ import com.example.biblia.domain.model.BarSize
 import com.example.biblia.domain.model.CrossRefFont
 import com.example.biblia.domain.model.LineSpacing
 import com.example.biblia.domain.model.NoteSort
+import com.example.biblia.domain.model.ReadingFont
 import com.example.biblia.domain.model.SearchScope
 import com.example.biblia.domain.model.ThemeMode
 import com.example.biblia.domain.model.UiScale
@@ -55,6 +56,7 @@ class SettingsRepository(private val context: Context) {
         val CROSS_REF_FONT = stringPreferencesKey("cross_ref_font")
         val BAR_SIZE = stringPreferencesKey("bar_size")
         val PAPER_GRAIN = booleanPreferencesKey("paper_grain")
+        val READING_FONT = stringPreferencesKey("reading_font")
         fun ttsVoice(language: String) = stringPreferencesKey("tts_voice_" + language)
         fun imported(versionId: String) = booleanPreferencesKey("imported_" + versionId)
     }
@@ -81,6 +83,7 @@ class SettingsRepository(private val context: Context) {
             crossRefFont = enumOrDefault(p[Keys.CROSS_REF_FONT], CrossRefFont.SERIF_ITALIC),
             barSize = enumOrDefault(p[Keys.BAR_SIZE], BarSize.NORMAL),
             paperGrain = p[Keys.PAPER_GRAIN] ?: false,
+            readingFont = enumOrDefault(p[Keys.READING_FONT], ReadingFont.DEFAULT),
             tts = TtsPrefs(
                 rate = (p[Keys.TTS_RATE] ?: 1f).coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE),
                 pitch = (p[Keys.TTS_PITCH] ?: 1f).coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH),
@@ -109,6 +112,7 @@ class SettingsRepository(private val context: Context) {
     suspend fun setVersionId(value: String) = edit { it[Keys.VERSION_ID] = value }
 
     suspend fun setPaperGrain(value: Boolean) = edit { it[Keys.PAPER_GRAIN] = value }
+    suspend fun setReadingFont(value: ReadingFont) = edit { it[Keys.READING_FONT] = value.name }
     suspend fun setBarSize(value: BarSize) = edit { it[Keys.BAR_SIZE] = value.name }
     suspend fun setShowCrossRefs(value: Boolean) = edit { it[Keys.SHOW_CROSS_REFS] = value }
     suspend fun setCrossRefFont(value: CrossRefFont) = edit { it[Keys.CROSS_REF_FONT] = value.name }
@@ -145,6 +149,7 @@ class SettingsRepository(private val context: Context) {
         p[Keys.CROSS_REF_FONT] = s.crossRefFont.name
         p[Keys.BAR_SIZE] = s.barSize.name
         p[Keys.PAPER_GRAIN] = s.paperGrain
+        p[Keys.READING_FONT] = s.readingFont.name
         p[Keys.TTS_RATE] = s.tts.rate.coerceIn(TtsPrefs.MIN_RATE, TtsPrefs.MAX_RATE)
         p[Keys.TTS_PITCH] = s.tts.pitch.coerceIn(TtsPrefs.MIN_PITCH, TtsPrefs.MAX_PITCH)
         p[Keys.TTS_NUMBERS] = s.tts.speakVerseNumbers

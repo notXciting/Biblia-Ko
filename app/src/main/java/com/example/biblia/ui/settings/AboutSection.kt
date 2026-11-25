@@ -3,6 +3,7 @@ package com.example.biblia.ui.settings
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,9 +31,9 @@ import com.example.biblia.data.BibleVersionRegistry
 
 /** About: app, developer, then every Bible version with its copyright. */
 @Composable
-fun AboutSection(currentVersionId: String, modifier: Modifier = Modifier) {
+fun AboutSection(currentVersionId: String, onOpenLicenses: () -> Unit, modifier: Modifier = Modifier, showTitle: Boolean = true) {
     Column(modifier.fillMaxWidth()) {
-        SectionTitle(stringResource(R.string.settings_about))
+        if (showTitle) SectionTitle(stringResource(R.string.settings_about))
         AboutCard {
             Text(
                 text = stringResource(R.string.app_name),
@@ -49,6 +51,9 @@ fun AboutSection(currentVersionId: String, modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            TextButton(onClick = onOpenLicenses, contentPadding = PaddingValues(horizontal = 0.dp)) {
+                Text(stringResource(R.string.licenses_title))
+            }
         }
         SectionTitle(stringResource(R.string.settings_bible_versions), Modifier.padding(top = 12.dp))
         AboutCard {

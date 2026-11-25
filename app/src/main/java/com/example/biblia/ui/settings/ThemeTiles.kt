@@ -56,7 +56,7 @@ fun ThemeTiles(
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 row.forEach { mode ->
                     ThemeTile(
-                        label = stringResource(labelOf(mode)),
+                        label = stringResource(themeLabel(mode)),
                         selected = current == mode,
                         onClick = { onSelect(mode) },
                         modifier = Modifier.weight(1f),
@@ -137,7 +137,7 @@ private fun Preview(palette: ThemePalette, accent: AccentColor, modifier: Modifi
     }
 }
 
-private fun labelOf(mode: ThemeMode): Int = when (mode) {
+internal fun themeLabel(mode: ThemeMode): Int = when (mode) {
     ThemeMode.SYSTEM -> R.string.theme_system
     ThemeMode.LIGHT -> R.string.theme_light
     ThemeMode.SEPIA -> R.string.theme_sepia

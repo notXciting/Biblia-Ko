@@ -99,7 +99,10 @@ fun BibleTheme(settings: AppSettings, content: @Composable () -> Unit) {
             PageStyle(Color(desk), Color(palette.verseNumber ?: palette.onBackground), settings.paperGrain)
         }
     }
-    CompositionLocalProvider(LocalPageStyle provides page) {
+    CompositionLocalProvider(
+        LocalPageStyle provides page,
+        LocalReadingType provides rememberReadingType(settings.readingFont),
+    ) {
         MaterialTheme(colorScheme = scheme, content = content)
     }
 }

@@ -12,6 +12,7 @@ import com.example.biblia.domain.model.BarSize
 import com.example.biblia.domain.model.CrossRefFont
 import com.example.biblia.domain.model.NoteSort
 import com.example.biblia.domain.model.NoteVerses
+import com.example.biblia.domain.model.ReadingFont
 import com.example.biblia.domain.model.ThemeMode
 import com.example.biblia.domain.model.Verse
 import com.example.biblia.domain.model.VerseNote
@@ -25,7 +26,7 @@ class BackupAndNotesListTest {
 
     private val settings = AppSettings(
         themeMode = ThemeMode.MIDNIGHT, accent = AccentColor.TEAL, fontSizeSp = 22f, uiScale = 1.15f,
-        noteSort = NoteSort.BIBLE, showCrossRefs = false, crossRefFont = CrossRefFont.SANS, barSize = BarSize.COMPACT, paperGrain = true, tts = TtsPrefs(rate = 1.25f, voices = mapOf("English" to "en-us-x-iol-local")),
+        noteSort = NoteSort.BIBLE, showCrossRefs = false, crossRefFont = CrossRefFont.SANS, barSize = BarSize.COMPACT, paperGrain = true, readingFont = ReadingFont.OPEN_DYSLEXIC, tts = TtsPrefs(rate = 1.25f, voices = mapOf("English" to "en-us-x-iol-local")),
     )
     private val backup = BackupData(
         exportedAt = 1_764_000_000_000, appVersion = "2.4.0", settings = settings,
@@ -48,6 +49,7 @@ class BackupAndNotesListTest {
         assertEquals(CrossRefFont.SANS, s.crossRefFont)
         assertEquals(BarSize.COMPACT, s.barSize)
         assertEquals(true, s.paperGrain)
+        assertEquals(ReadingFont.OPEN_DYSLEXIC, s.readingFont)
         assertEquals(1.25f, s.tts.rate)
         assertEquals(mapOf("English" to "en-us-x-iol-local"), s.tts.voices)
         assertEquals("2.4.0", decoded.appVersion)
@@ -64,7 +66,7 @@ class BackupAndNotesListTest {
     @Test
     fun missingOrBadValuesFallBackSafely() {
         val raw = """{"app":"biblia-ko","format":1,
-            "settings":{"themeMode":"NEON","fontSizeSp":99,"uiScale":5},
+            "settings":{"themeMode":"NEON","fontSizeSp":99,"uiScale":5,"readingFont":"COMIC_SANS"},
             "highlights":[{"book":99,"chapter":1,"verse":1,"color":"RED"},{"book":1,"chapter":1,"verse":1,"color":"RED"}],
             "notes":[{"book":1,"chapter":1,"verses":[],"text":"x"},{"book":1,"chapter":1,"verses":[2,1],"text":"  ok  "}]}"""
         val d = BackupCodec.decode(raw)
@@ -73,6 +75,7 @@ class BackupAndNotesListTest {
         assertEquals(true, d.settings!!.showCrossRefs)
         assertEquals(CrossRefFont.SERIF_ITALIC, d.settings!!.crossRefFont)
         assertEquals(BarSize.NORMAL, d.settings!!.barSize)
+        assertEquals(ReadingFont.MERRIWEATHER, d.settings!!.readingFont) // unknown font -> default
         assertEquals(32f, d.settings!!.fontSizeSp)
         assertEquals(1.3f, d.settings!!.uiScale)
         assertEquals(1, d.highlights.size) // book 99 dropped

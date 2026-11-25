@@ -43,7 +43,7 @@ import com.example.biblia.ui.reader.formatNoteDate
  * picks (Downloads, Drive, ...), and import such a file on another phone.
  */
 @Composable
-fun BackupSection(container: AppContainer) {
+fun BackupSection(container: AppContainer, showTitle: Boolean = true) {
     val vm: BackupViewModel = viewModel(factory = viewModelFactory { initializer { BackupViewModel(container) } })
     val context = LocalContext.current
     val exportLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) {
@@ -53,7 +53,7 @@ fun BackupSection(container: AppContainer) {
     val importLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { vm.read(it) }
 
     Column(Modifier.fillMaxWidth()) {
-        SectionTitle(stringResource(R.string.backup_title))
+        if (showTitle) SectionTitle(stringResource(R.string.backup_title))
         Text(
             text = stringResource(R.string.backup_hint),
             style = MaterialTheme.typography.bodySmall,

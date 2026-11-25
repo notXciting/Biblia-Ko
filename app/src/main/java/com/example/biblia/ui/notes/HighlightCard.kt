@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -49,6 +48,7 @@ import com.example.biblia.R
 import com.example.biblia.domain.model.HighlightColor
 import com.example.biblia.ui.KeepAppLocale
 import com.example.biblia.ui.reader.formatNoteDate
+import com.example.biblia.ui.theme.LocalReadingType
 
 /**
  * One highlighted passage: colour bar, reference, date and the verse text.
@@ -101,7 +101,7 @@ internal fun HighlightCard(
                 Text(
                     text = item.text,
                     style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = FontFamily.Serif,
+                    fontFamily = LocalReadingType.current.family,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )

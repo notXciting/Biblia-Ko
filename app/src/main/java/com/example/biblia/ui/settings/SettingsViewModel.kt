@@ -38,7 +38,7 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
     var previewVerses by mutableStateOf<List<Verse>>(emptyList()); private set
     var previewReference by mutableStateOf(""); private set
 
-    /** John 3:16 from the selected version for the font-size preview (null = not loaded yet). */
+    /** John 3:16 from the selected version: reading-font sample and voice test (null = not loaded yet). */
     var fontPreviewText by mutableStateOf<String?>(null); private set
     var fontPreviewReference by mutableStateOf<String?>(null); private set
 
@@ -76,6 +76,9 @@ class SettingsViewModel(private val container: AppContainer) : ViewModel() {
     fun showVoiceHelp(language: String, status: VoiceStatus) = container.tts.showVoiceHelp(language, status)
 
     fun setPaperGrain(value: Boolean) { viewModelScope.launch { settingsRepo.setPaperGrain(value) } }
+    fun setReadingFont(value: com.example.biblia.domain.model.ReadingFont) {
+        viewModelScope.launch { settingsRepo.setReadingFont(value) }
+    }
     fun setBarSize(value: BarSize) { viewModelScope.launch { settingsRepo.setBarSize(value) } }
     fun setShowCrossRefs(value: Boolean) { viewModelScope.launch { settingsRepo.setShowCrossRefs(value) } }
     fun setCrossRefFont(value: CrossRefFont) { viewModelScope.launch { settingsRepo.setCrossRefFont(value) } }

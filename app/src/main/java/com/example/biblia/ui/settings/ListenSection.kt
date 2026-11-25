@@ -49,13 +49,15 @@ fun ListenSection(
     onVoice: (language: String, voiceName: String?) -> Unit,
     onSpeakNumbers: (Boolean) -> Unit,
     onTest: () -> Unit,
+    /** False on the Listen page, whose header already says "Pakinggan". */
+    showTitle: Boolean = true,
 ) {
     LifecycleResumeEffect(Unit) {
         onRefresh()
         onPauseOrDispose { }
     }
     Column(Modifier.fillMaxWidth()) {
-        SectionTitle(stringResource(R.string.settings_listen))
+        if (showTitle) SectionTitle(stringResource(R.string.settings_listen))
         Text(
             text = stringResource(R.string.listen_settings_hint),
             style = MaterialTheme.typography.bodySmall,

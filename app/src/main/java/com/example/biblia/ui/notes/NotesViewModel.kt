@@ -12,6 +12,7 @@ import com.example.biblia.domain.model.NoteSort
 import com.example.biblia.domain.model.NoteVerses
 import com.example.biblia.domain.model.VerseNote
 import com.example.biblia.domain.reference.ReferenceFormatter
+import com.example.biblia.ui.reader.NoteEditorController
 import com.example.biblia.ui.reader.NoteEditorState
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,7 +33,9 @@ class NotesViewModel(private val container: AppContainer) : ViewModel() {
         repo.observeAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     var query by mutableStateOf(""); private set
-    var editor by mutableStateOf<NoteEditorState?>(null); private set
+    /** The open note sheet, with autosave (same rules as in the reader). */
+    val noteEditor = NoteEditorController(repo, viewModelScope)
+    val editor: NoteEditorState? get() = noteEditor.state
     private var jumping = false
 
     fun updateQuery(value: String) { query = value }
@@ -51,8 +54,8 @@ class NotesViewModel(private val container: AppContainer) : ViewModel() {
             val versionId = settings.initial().versionId
             val content = runCatching { container.chapterCache.get(versionId, note.book, note.chapter) }.getOrNull()
             val quote = content?.let { NoteVerses.quote(it.verses, it.spanEnds, note.verses) }.orEmpty()
-            editor = NoteEditorState(
-                reference(note), note.book, note.chapter, note.verses, quote, note.id, note.text, note.updatedAt,
+            noteEditor.show(
+                NoteEditorState(reference(note), note.book, note.chapter, note.verses, quote, note.id, note.text, note.updatedAt),
             )
         }
     }
@@ -61,25 +64,11 @@ class NotesViewModel(private val container: AppContainer) : ViewModel() {
     fun openFor(book: Int, chapter: Int, verses: Set<Int>, reference: String, quote: String) {
         viewModelScope.launch {
             val existing = NoteVerses.exact(repo.chapter(book, chapter), verses)
-            editor = NoteEditorState(
-                reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty(), existing?.updatedAt,
+            noteEditor.show(
+                NoteEditorState(reference, book, chapter, verses, quote, existing?.id, existing?.text.orEmpty(), existing?.updatedAt),
             )
         }
     }
-
-    fun save(text: String) {
-        val e = editor ?: return
-        editor = null
-        viewModelScope.launch { repo.save(e.noteId, e.book, e.chapter, e.verses, text) }
-    }
-
-    fun delete() {
-        val id = editor?.noteId
-        editor = null
-        if (id != null) viewModelScope.launch { repo.delete(id) }
-    }
-
-    fun close() { editor = null }
 
     /**
      * Opens the note's first verse in the reader, then [onReady] pops back to
@@ -89,9 +78,8 @@ class NotesViewModel(private val container: AppContainer) : ViewModel() {
         val e = editor ?: return
         if (jumping) return
         jumping = true
-        editor = null
+        noteEditor.dismiss(text) // keeps what was typed
         viewModelScope.launch {
-            if (text.trim() != e.text.trim() && text.isNotBlank()) repo.save(e.noteId, e.book, e.chapter, e.verses, text)
             container.openInReader(settings.initial().versionId, e.book, e.chapter, e.verses.min())
             onReady()
             jumping = false

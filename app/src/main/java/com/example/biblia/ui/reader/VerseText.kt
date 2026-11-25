@@ -12,7 +12,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontFamily
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -49,6 +48,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.EditNote
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import com.example.biblia.perf.VersePerf
+import com.example.biblia.ui.theme.LocalReadingType
 
 internal class ChapterFlow(
     val annotated: AnnotatedString,
@@ -284,9 +284,9 @@ fun ChapterFlowText(
             buildStyled(flow, selectedVerses, selectionColor, highlights)
         },
         style = TextStyle(
-            fontFamily = FontFamily.Serif,
+            fontFamily = LocalReadingType.current.family,
             fontSize = fontSize,
-            lineHeight = fontSize * lineHeightMultiplier,
+            lineHeight = fontSize * lineHeightMultiplier * LocalReadingType.current.lineHeight,
             lineBreak = if (balanced) LineBreak.Paragraph else LineBreak.Simple,
             color = MaterialTheme.colorScheme.onBackground,
         ),
